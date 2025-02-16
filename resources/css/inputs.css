@@ -1,0 +1,17 @@
+input.no-border {
+    background-color: #f0f0f0;
+    border: none;
+}
+
+input.no-border:focus {
+    box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.5);
+}
+
+input.no-border:active:focus {
+    box-shadow: 0 0 0 0.25rem rgba(111, 66, 193, 0.5);
+}
+
+.form-check-input:checked {
+    background-color: #6f42c1 !important;
+    border-color: #6f42c1 !important;
+}
