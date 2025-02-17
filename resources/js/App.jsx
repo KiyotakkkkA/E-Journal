@@ -17,6 +17,9 @@ import UserPage from "./pages/User";
 import NotFound from "./pages/NotFound";
 import Main from "./pages/Main";
 import axios from "./axios";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
 const checkAuth = async () => {
     try {
         const response = await axios.get("/api/check-auth");
@@ -25,6 +28,15 @@ const checkAuth = async () => {
         return false;
     }
 };
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            retry: 1,
+        },
+    },
+});
 
 const Layout = ({ isAuthenticated, canViewAdminPanel, isStudent }) => {
     return (
@@ -110,13 +122,16 @@ createInertiaApp({
         checkAuth().then((data) => {
             const root = createRoot(el);
             root.render(
-                <Layout
-                    isAuthenticated={data.isAuthenticated}
-                    canViewAdminPanel={data.canViewAdminPanel}
-                    isStudent={data.isStudent}
-                >
-                    <App {...props} />
-                </Layout>
+                <QueryClientProvider client={queryClient}>
+                    <Layout
+                        isAuthenticated={data.isAuthenticated}
+                        canViewAdminPanel={data.canViewAdminPanel}
+                        isStudent={data.isStudent}
+                    >
+                        <App {...props} />
+                    </Layout>
+                    <ReactQueryDevtools />
+                </QueryClientProvider>
             );
         });
     },

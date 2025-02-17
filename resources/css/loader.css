@@ -6,37 +6,21 @@
 }
 
 .loader {
-    display: flex;
-    gap: 8px;
+    @apply w-12 h-12 border-4 border-purple-600 rounded-full relative;
+    animation: rotation 1s linear infinite;
 }
 
-.circle {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: #6f42c1;
-    animation: bounce 0.5s alternate infinite;
+.loader::after {
+    content: "";
+    @apply absolute top-[-4px] left-[-4px] right-[-4px] bottom-[-4px]
+           border-4 border-t-purple-300 border-transparent rounded-full;
 }
 
-.circle:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-.circle:nth-child(3) {
-    animation-delay: 0.2s;
-}
-
-.circle:nth-child(4) {
-    animation-delay: 0.3s;
-}
-
-@keyframes bounce {
-    from {
-        transform: translateY(0);
-        opacity: 1;
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
     }
-    to {
-        transform: translateY(-16px);
-        opacity: 0.3;
+    100% {
+        transform: rotate(360deg);
     }
 }

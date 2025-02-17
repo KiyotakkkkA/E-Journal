@@ -39,4 +39,9 @@ class Student extends Model
     {
         return $this->hasMany(StudentRequest::class);
     }
+
+    public function getApprovedRequest()
+    {
+        return $this->requests()->where('status', 'approved')->first();
+    }
 }

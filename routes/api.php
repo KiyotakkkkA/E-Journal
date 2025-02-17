@@ -17,11 +17,13 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
 });
 
 Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
-    Route::post('/groups', [GroupController::class, 'store']);
-    Route::get('/groups/students', [GroupController::class, 'getStudents']);
 
-    Route::get('/requests', [StudentRequestController::class, 'getCount']);
-    Route::get('/requests/all', [StudentRequestController::class, 'adminIndex']);
-    Route::post('/requests/{request}/approve', [StudentRequestController::class, 'approve']);
-    Route::post('/requests/{request}/reject', [StudentRequestController::class, 'reject']);
+    Route::prefix('groups')->group(function () {
+        Route::get('/students', [GroupController::class, 'getStudents']);
+    });
+
+    Route::prefix('requests')->group(function () {
+        Route::get('/', [StudentRequestController::class, 'getCount']);
+        Route::get('/all', [StudentRequestController::class, 'adminIndex']);
+    });
 });

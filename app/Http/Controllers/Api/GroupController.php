@@ -33,4 +33,23 @@ class GroupController extends Controller
 
         return response()->json(['students' => $students]);
     }
+
+    public function update(Request $request, Group $group)
+    {
+        $group->update($request->all());
+        return response()->json(['group' => $group]);
+    }
+
+    public function delete(Group $group)
+    {
+        $students = $group->students;
+        foreach ($students as $student) {
+            $student->group_id = null;
+            $student->getApprovedRequest()->status = 'group_deleted';
+            $student->save();
+        }
+        $group->update(['is_active' => false]);
+        return response()->json(['message' => 'Group deleted successfully']);
+    }
 }
+

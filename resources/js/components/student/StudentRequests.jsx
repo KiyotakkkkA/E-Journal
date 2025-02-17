@@ -4,43 +4,46 @@ const RequestCard = ({ request, status }) => {
     const statusConfig = {
         pending: {
             icon: "mdi:clock-outline",
-            color: "text-warning",
+            color: "text-yellow-600",
             text: "В обработке",
-            bgColor: "bg-warning bg-opacity-10",
+            bgColor: "bg-yellow-50",
         },
         approved: {
             icon: "mdi:check-circle-outline",
-            color: "text-success",
+            color: "text-green-600",
             text: "Одобрено",
-            bgColor: "bg-success bg-opacity-10",
+            bgColor: "bg-green-50",
         },
         rejected: {
             icon: "mdi:close-circle-outline",
-            color: "text-danger",
+            color: "text-red-600",
             text: "Отклонено",
-            bgColor: "bg-danger bg-opacity-10",
+            bgColor: "bg-red-50",
         },
     };
 
     const config = statusConfig[status];
 
     return (
-        <div className={`card p-3 me-3 ${config.bgColor}`}>
-            <div className="d-flex justify-content-between align-items-start mb-2 gap-2 align-items-center">
-                <h6 className="card-subtitle text-muted">
+        <div className={`p-4 rounded-lg ${config.bgColor} mr-3`}>
+            <div className="flex justify-between items-start mb-3 gap-2">
+                <h6 className="text-sm font-medium text-gray-600">
                     Заявка на зачисление
                 </h6>
-                <span className={`badge ${config.bgColor} ${config.color}`}>
-                    <Icon icon={config.icon} className="me-1" />
+                <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                ${config.bgColor} ${config.color}`}
+                >
+                    <Icon icon={config.icon} className="mr-1" />
                     {config.text}
                 </span>
             </div>
-            <div className="mb-2">
-                <strong>ФИО: </strong>
+            <div className="mb-2 text-sm">
+                <span className="font-medium">ФИО: </span>
                 {request.name}
             </div>
-            <div>
-                <strong>Группа: </strong>
+            <div className="text-sm">
+                <span className="font-medium">Группа: </span>
                 {request.group.name}
             </div>
         </div>
@@ -54,12 +57,12 @@ const StudentRequests = ({ requests }) => {
                 ([status, requestList]) =>
                     requestList.length > 0 && (
                         <div key={status} className="mb-4">
-                            <h5 className="mb-3">
+                            <h5 className="text-lg font-medium text-gray-800 mb-3">
                                 {status === "pending" && "Активные заявки"}
                                 {status === "approved" && "Одобренные заявки"}
                                 {status === "rejected" && "Отклоненные заявки"}
                             </h5>
-                            <div className="d-flex flex-wrap gap-3">
+                            <div className="flex flex-wrap gap-3">
                                 {requestList.map((request) => (
                                     <RequestCard
                                         key={request.id}

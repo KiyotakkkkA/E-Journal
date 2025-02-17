@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import InputWithIcon from "../../components/elements/InputWithIcon";
-import axios from "../../axios";
+import { useRegister } from "../../scripts/hooks/useAuthQueries";
 import {
     validateEmail,
     validatePassword,
@@ -19,17 +19,12 @@ export default function Register() {
         agree: false,
     });
 
-    const register = () => {
-        if (
-            !formData.agree ||
-            !formData.password ||
-            !formData.password_confirmation ||
-            !formData.email
-        ) {
-            return;
-        }
-        axios.post("/register", formData).then((response) => {});
-    };
+    const {
+        mutate: register,
+        isPending: isRegisterLoading,
+        isSuccess: isRegisterSuccess,
+        error: registerError,
+    } = useRegister();
 
     const handleChange = (name, value, additionalParams = {}) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -60,11 +55,22 @@ export default function Register() {
     };
 
     return (
-        <div className="container card mt-5 w-25 px-0">
-            <h1 className="text-center bg-purple text-white p-2">
+        <div className="max-w-md mx-auto mt-20 bg-white rounded-lg shadow-lg overflow-hidden">
+            <h1 className="text-center bg-purple-600 text-white py-3 text-2xl font-semibold uppercase">
                 Регистрация
             </h1>
-            <form className="mt-3 px-5">
+            {registerError && (
+                <div className="mx-4 mt-4 p-3 bg-red-100 text-red-700 rounded-md text-center">
+                    {registerError.general}
+                </div>
+            )}
+            <form
+                className="p-6 space-y-4"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    register(formData);
+                }}
+            >
                 <InputWithIcon
                     icon="mdi:email"
                     type="text"
@@ -75,7 +81,7 @@ export default function Register() {
                     error={errors.email}
                     autoComplete="email"
                 />
-                <div className="mb-3 position-relative">
+                <div className="space-y-1">
                     <InputWithIcon
                         icon="mdi:lock"
                         type="password"
@@ -89,55 +95,55 @@ export default function Register() {
                         autoComplete="password"
                     />
                     {formData.password.length === 0 && (
-                        <div className="form-text">
+                        <span className="text-xs text-gray-500 pl-2">
                             Пароль должен содержать минимум 8 символов
-                        </div>
+                        </span>
                     )}
                 </div>
-                <div className="mb-3 position-relative">
-                    <InputWithIcon
-                        icon="mdi:lock"
-                        type="password"
-                        id="password_confirmation"
-                        placeholder="Повторите пароль..."
-                        value={formData.password_confirmation}
-                        onChange={(e) =>
-                            handleChange(
-                                "password_confirmation",
-                                e.target.value,
-                                { password: formData.password }
-                            )
-                        }
-                        error={errors.password_confirmation}
-                    />
-                </div>
-                <div className="mb-3 d-flex gap-2">
+                <InputWithIcon
+                    icon="mdi:lock-check"
+                    type="password"
+                    id="password_confirmation"
+                    placeholder="Повторите пароль..."
+                    value={formData.password_confirmation}
+                    onChange={(e) =>
+                        handleChange("password_confirmation", e.target.value, {
+                            password: formData.password,
+                        })
+                    }
+                    error={errors.password_confirmation}
+                />
+                <div className="flex items-center space-x-2">
                     <input
                         type="checkbox"
-                        className="form-check-input"
                         id="agree"
                         required
                         onChange={(e) =>
                             handleChange("agree", e.target.checked)
                         }
+                        className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                     />
-                    <label
-                        htmlFor="agree"
-                        className="form-check-label text-muted"
-                    >
+                    <label htmlFor="agree" className="text-gray-600 text-sm">
                         Я согласен с условиями использования
                     </label>
                 </div>
                 <button
                     type="submit"
-                    className="btn btn-purple mb-3 w-100"
-                    onClick={register}
+                    className="w-full py-2.5 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
+                             transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed
+                             font-medium"
+                    disabled={isRegisterLoading || isRegisterSuccess}
                 >
-                    Зарегистрироваться
+                    {isRegisterLoading || isRegisterSuccess
+                        ? "Загрузка..."
+                        : "Зарегистрироваться"}
                 </button>
-                <div className="d-flex gap-2 mb-3 justify-content-center">
-                    Есть учетная запись?{" "}
-                    <a className="text-purple" href="/login">
+                <div className="text-center text-sm mt-2">
+                    <span className="text-gray-600">Есть учетная запись?</span>{" "}
+                    <a
+                        href="/login"
+                        className="text-purple-600 hover:text-purple-500 font-medium"
+                    >
                         Войти
                     </a>
                 </div>

@@ -6,6 +6,20 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\StudentRequestController;
+use App\Http\Controllers\Api\GroupController;
+
+Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
+    Route::prefix('groups')->group(function () {
+        Route::post('/', [GroupController::class, 'store']);
+        Route::put('/{group}', [GroupController::class, 'update']);
+        Route::delete('/{group}', [GroupController::class, 'delete']);
+    });
+
+    Route::prefix('requests')->group(function () {
+        Route::post('/{request}/approve', [StudentRequestController::class, 'approve']);
+        Route::post('/{request}/reject', [StudentRequestController::class, 'reject']);
+    });
+});
 
 Route::middleware("auth")->group(function () {
     Route::post("/user/student", [StudentRequestController::class, "store"]);

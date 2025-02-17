@@ -1,94 +1,82 @@
-import React, { useState, useEffect } from "react";
-import axios from "../axios";
+import React, { useState } from "react";
 import AnimatedLoader from "./elements/AnimatedLoader";
-import { getGroups } from "../scripts/graphql";
 import UserCard from "./user/UserCard";
 import StudentRequestForm from "./student/StudentRequestForm";
 import StudentRequests from "./student/StudentRequests";
+import {
+    useUserInfo,
+    useUserRequests,
+    useSendRequest,
+} from "../scripts/hooks/useUserQueries";
+import { useGroups } from "../scripts/hooks/useGroupsQueries";
+import { useLogout } from "../scripts/hooks/useAuthQueries";
 
 const UserInfo = ({ isStudent }) => {
-    const [userInfo, setUserInfo] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [isRequestNeeded, setIsRequestNeeded] = useState(false);
-    const [groups, setGroups] = useState([]);
     const [requestData, setRequestData] = useState({
         name: "",
         group_id: "",
     });
-    const [requests, setRequests] = useState({
-        pending: [],
-        approved: [],
-        rejected: [],
-    });
 
-    const fetchUserData = async () => {
-        try {
-            setIsLoading(true);
-            const response = await axios.get("/api/user");
-            setUserInfo(response.data.user);
-            const requests = await axios.get("api/user/student");
-            setRequests(requests.data.requests);
-            if (isStudent && !response.data.user.group.name) {
-                const groups = await getGroups();
-                setGroups(groups.data.groups);
-            }
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const {
+        mutate: logout,
+        isPending: isLogoutLoading,
+        isSuccess: isLogoutSuccess,
+    } = useLogout();
 
-    useEffect(() => {
-        fetchUserData();
-    }, []);
+    const {
+        data: userData,
+        isLoading: isUserLoading,
+        error: userError,
+    } = useUserInfo();
 
-    const sendRequest = async () => {
-        try {
-            const response = await axios.post("/user/student", {
-                name: requestData.name,
-                group_id: requestData.group_id,
-            });
+    const {
+        data: requests = { pending: [], approved: [], rejected: [] },
+        isLoading: isRequestsLoading,
+    } = useUserRequests();
 
-            if (response.data.status) {
+    const { data: groups = [], isLoading: isGroupsLoading } = useGroups();
+
+    const {
+        mutate: sendRequest,
+        isPending: isRequestLoading,
+        isSuccess: isRequestSuccess,
+    } = useSendRequest();
+
+    const handleSubmit = () => {
+        sendRequest(requestData, {
+            onSuccess: () => {
                 setIsRequestNeeded(false);
-                await fetchUserData();
-            }
-        } catch (error) {
-            console.error("Error sending request:", error);
-        }
-    };
-
-    const logout = () => {
-        axios.post("/logout").then((response) => {
-            window.location.reload();
+                setRequestData({ name: "", group_id: "" });
+            },
         });
     };
 
-    if (isLoading) {
-        return <AnimatedLoader />;
+    if (isUserLoading || isRequestsLoading || isGroupsLoading) {
+        return <AnimatedLoader className="mt-3" />;
     }
 
-    if (error) {
-        return <div>Error: {error}</div>;
+    if (userError) {
+        return <div>Error: {userError.message}</div>;
     }
 
     return (
-        <div className="container">
-            <UserCard userInfo={userInfo} isStudent={isStudent} />
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <UserCard userInfo={userData?.user} isStudent={isStudent} />
 
             {!isRequestNeeded &&
                 isStudent &&
-                !userInfo.group.name &&
+                !userData?.user?.currentGroup &&
                 requests.pending.length === 0 &&
-                requests.approved.length === 0 && (
-                    <div className="d-flex mt-4">
+                requests.approved.length === 0 &&
+                !isRequestLoading &&
+                !isRequestSuccess && (
+                    <div className="d-flex mt-4 ">
                         <button
-                            className="btn btn-purple"
+                            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all duration-200"
                             onClick={() => setIsRequestNeeded(true)}
                         >
-                            Отправить заявку на прикрепление к группе
+                            Прикрепиться к группе
                         </button>
                     </div>
                 )}
@@ -98,13 +86,17 @@ const UserInfo = ({ isStudent }) => {
                     requestData={requestData}
                     setRequestData={setRequestData}
                     groups={groups}
-                    onSubmit={sendRequest}
+                    onSubmit={handleSubmit}
                 />
             )}
 
             <StudentRequests requests={requests} />
 
-            <button className="btn btn-danger mt-2" onClick={logout}>
+            <button
+                className="btn btn-danger"
+                onClick={() => logout()}
+                disabled={isLogoutLoading || isLogoutSuccess}
+            >
                 Выйти
             </button>
         </div>

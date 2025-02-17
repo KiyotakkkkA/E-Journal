@@ -4,7 +4,8 @@ scalar DateTime
 
 "Indicates what fields are available at the top level of a query operation."
 type Query {
-    groups: [Group!]! @all
+    groups: [Group!]!
+        @field(resolver: "App\\GraphQL\\Queries\\GroupsQuery@resolve")
 }
 
 type Group {
@@ -12,4 +13,5 @@ type Group {
     name: String!
     max_students: Int!
     students_count: Int
+    is_active: Boolean!
 }

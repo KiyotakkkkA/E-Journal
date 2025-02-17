@@ -21,11 +21,11 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            return response()->json(['errors' => "Неверный формат данных"], 400);
         }
 
         if ($request->password !== $request->password_confirmation) {
-            return response()->json(['errors' => 'Passwords do not match'], 400);
+            return response()->json(['errors' => 'Пароли не совпадают'], 400);
         }
 
         $user = User::create([
@@ -50,13 +50,13 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            return response()->json(['errors' => "Неверная почта или пароль"], 400);
         }
 
         $remember = $request->boolean('remember', false);
 
         if (!Auth::attempt($request->only('email', 'password'), $remember)) {
-            return response()->json(['errors' => 'Invalid credentials'], 401);
+            return response()->json(['errors' => 'Неверная почта или пароль'], 401);
         }
 
         $request->session()->regenerate();

@@ -1,72 +1,94 @@
-import { Icon } from "@iconify/react";
+import React from "react";
 
 const GroupForm = ({ newGroup, setNewGroup, errors, onSubmit, onCancel }) => {
     return (
-        <div className="card mb-4">
-            <div className="card-body">
-                <h5 className="card-title mb-3">Новая группа</h5>
-                <form onSubmit={onSubmit}>
-                    <div className="mb-3">
-                        <label className="form-label">Название группы</label>
-                        <input
-                            type="text"
-                            className={`form-control ${
-                                errors.name ? "is-invalid" : ""
-                            }`}
-                            value={newGroup.name}
-                            onChange={(e) =>
-                                setNewGroup({
-                                    ...newGroup,
-                                    name: e.target.value,
-                                })
-                            }
-                        />
-                        {errors.name && (
-                            <div className="invalid-feedback">
-                                {errors.name}
-                            </div>
-                        )}
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">
-                            Максимальное количество студентов
-                        </label>
-                        <input
-                            type="number"
-                            className={`form-control ${
-                                errors.max_students ? "is-invalid" : ""
-                            }`}
-                            value={newGroup.max_students}
-                            onChange={(e) =>
-                                setNewGroup({
-                                    ...newGroup,
-                                    max_students: e.target.value,
-                                })
-                            }
-                            min="1"
-                            max="30"
-                        />
-                        {errors.max_students && (
-                            <div className="invalid-feedback">
-                                {errors.max_students}
-                            </div>
-                        )}
-                    </div>
-                    <div className="d-flex gap-2">
-                        <button type="submit" className="btn btn-purple">
-                            Создать группу
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={onCancel}
-                        >
-                            Отмена
-                        </button>
-                    </div>
-                </form>
+        <form onSubmit={onSubmit} className="space-y-6">
+            <div>
+                <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                    Название группы
+                </label>
+                <input
+                    type="text"
+                    id="name"
+                    value={newGroup.name}
+                    onChange={(e) =>
+                        setNewGroup({ ...newGroup, name: e.target.value })
+                    }
+                    className={`
+                        w-full px-4 py-2 bg-white border rounded-lg
+                        text-gray-900 text-sm focus:ring-2 focus:ring-purple-600
+                        transition-colors duration-200
+                        ${errors.name ? "border-red-300" : "border-gray-300"}
+                    `}
+                    placeholder="Введите название группы"
+                />
+                {errors.name && (
+                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                )}
             </div>
-        </div>
+
+            <div>
+                <label
+                    htmlFor="max_students"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                    Максимальное количество студентов
+                </label>
+                <input
+                    type="number"
+                    id="max_students"
+                    min="1"
+                    value={newGroup.max_students}
+                    onChange={(e) =>
+                        setNewGroup({
+                            ...newGroup,
+                            max_students: parseInt(e.target.value),
+                        })
+                    }
+                    className={`
+                        w-full px-4 py-2 bg-white border rounded-lg
+                        text-gray-900 text-sm focus:ring-2 focus:ring-purple-600
+                        transition-colors duration-200
+                        ${
+                            errors.max_students
+                                ? "border-red-300"
+                                : "border-gray-300"
+                        }
+                    `}
+                />
+                {errors.max_students && (
+                    <p className="mt-1 text-sm text-red-600">
+                        {errors.max_students}
+                    </p>
+                )}
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="px-4 py-2 text-sm font-medium text-gray-700
+                             bg-white border border-gray-300 rounded-lg
+                             hover:bg-gray-50 focus:outline-none focus:ring-2
+                             focus:ring-offset-2 focus:ring-purple-500
+                             transition-colors duration-200"
+                >
+                    Отмена
+                </button>
+                <button
+                    type="submit"
+                    className="px-4 py-2 text-sm font-medium text-white
+                             bg-purple-600 rounded-lg hover:bg-purple-700
+                             focus:outline-none focus:ring-2 focus:ring-offset-2
+                             focus:ring-purple-500 transition-colors duration-200"
+                >
+                    Создать группу
+                </button>
+            </div>
+        </form>
     );
 };
 

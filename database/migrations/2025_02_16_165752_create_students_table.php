@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('group_id')->constrained('groups');
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'group_deleted'])->default('pending');
             $table->timestamps();
         });
     }

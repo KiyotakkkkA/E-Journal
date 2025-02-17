@@ -9,7 +9,7 @@ class Group extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'max_students', 'students_count'];
+    protected $fillable = ['name', 'max_students', 'students_count', 'is_active'];
 
     public function students()
     {

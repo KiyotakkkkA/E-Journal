@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('max_students');
             $table->integer('students_count')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

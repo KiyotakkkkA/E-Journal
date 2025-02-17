@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import InputWithIcon from "../../components/elements/InputWithIcon";
-import axios from "../../axios";
 import { validateEmail } from "../../scripts/validation";
+import { useLogin } from "../../scripts/hooks/useAuthQueries";
 
 export default function Login() {
     const [formData, setFormData] = useState({
@@ -9,16 +9,14 @@ export default function Login() {
         password: "",
         remember: false,
     });
-    const [errors, setErrors] = useState({
-        email: "",
-    });
+    const [serverErrors, setServerErrors] = useState({});
 
-    const login = () => {
-        if (!formData.email || !formData.password) {
-            return;
-        }
-        axios.post("/login", formData).then((response) => {});
-    };
+    const {
+        mutate: login,
+        isPending: isLoginLoading,
+        isSuccess: isLoginSuccess,
+        error: loginError,
+    } = useLogin();
 
     const handleChange = (name, value, additionalParams = {}) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -28,7 +26,7 @@ export default function Login() {
         };
 
         if (validationRules[name]) {
-            setErrors((prev) => ({
+            setServerErrors((prev) => ({
                 ...prev,
                 [name]: validationRules[name](),
             }));
@@ -36,17 +34,30 @@ export default function Login() {
     };
 
     return (
-        <div className="container card mt-5 w-25 px-0">
-            <h1 className="text-center bg-purple text-white p-2">Вход</h1>
-            <form className="mt-3 px-5">
+        <div className="max-w-md mx-auto mt-20 bg-white rounded-lg shadow-lg overflow-hidden">
+            <h1 className="text-center bg-purple-600 text-white py-3 text-2xl font-semibold uppercase">
+                Вход
+            </h1>
+            {loginError && (
+                <div className="mx-4 mt-4 p-3 bg-red-100 text-red-700 rounded-md text-center">
+                    {loginError.message}
+                </div>
+            )}
+            <form
+                className="p-6 space-y-4"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    login(formData);
+                }}
+            >
                 <InputWithIcon
                     icon="mdi:email"
-                    type="text"
+                    type="email"
                     id="email"
                     placeholder="Введите электронную почту..."
                     value={formData.email}
                     onChange={(e) => handleChange("email", e.target.value)}
-                    error={errors.email}
+                    error={serverErrors.email}
                     autoComplete="email"
                 />
 
@@ -59,39 +70,47 @@ export default function Login() {
                     onChange={(e) => handleChange("password", e.target.value)}
                     autoComplete="password"
                     appendContent={
-                        <a className="text-purple" href="/forgot-password">
+                        <a
+                            className="text-purple-600 hover:text-purple-500 text-sm"
+                            href="/forgot-password"
+                        >
                             Забыли пароль?
                         </a>
                     }
                 />
 
-                <div className="mb-3 d-flex gap-2">
+                <div className="flex items-center space-x-2">
                     <input
                         type="checkbox"
-                        className="form-check-input"
                         id="remember"
                         checked={formData.remember}
                         onChange={(e) =>
                             handleChange("remember", e.target.checked)
                         }
+                        className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                     />
                     <label
                         htmlFor="remember"
-                        className="form-check-label text-muted"
+                        className="text-gray-600 text-sm h-5"
                     >
                         Запомнить меня
                     </label>
                 </div>
+
                 <button
                     type="submit"
-                    className="btn btn-purple mb-3 w-100"
-                    onClick={login}
+                    className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isLoginLoading || isLoginSuccess}
                 >
-                    Войти
+                    {isLoginLoading || isLoginSuccess ? "Вход..." : "Войти"}
                 </button>
-                <div className="d-flex gap-2 mb-3 justify-content-center">
-                    Нет учетной записи?{" "}
-                    <a className="text-purple" href="/register">
+
+                <div className="text-center text-sm">
+                    <span className="text-gray-600">Нет учетной записи?</span>{" "}
+                    <a
+                        className="text-purple-600 hover:text-purple-500 font-medium"
+                        href="/register"
+                    >
                         Зарегистрироваться
                     </a>
                 </div>
