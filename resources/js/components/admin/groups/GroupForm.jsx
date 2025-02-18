@@ -1,6 +1,13 @@
 import React from "react";
 
-const GroupForm = ({ newGroup, setNewGroup, errors, onSubmit, onCancel }) => {
+const GroupForm = ({
+    newGroup,
+    setNewGroup,
+    errors,
+    onSubmit,
+    onCancel,
+    isLoading,
+}) => {
     return (
         <form onSubmit={onSubmit} className="space-y-6">
             <div>
@@ -84,8 +91,9 @@ const GroupForm = ({ newGroup, setNewGroup, errors, onSubmit, onCancel }) => {
                              bg-purple-600 rounded-lg hover:bg-purple-700
                              focus:outline-none focus:ring-2 focus:ring-offset-2
                              focus:ring-purple-500 transition-colors duration-200"
+                    disabled={isLoading}
                 >
-                    Создать группу
+                    {isLoading ? "Создание..." : "Создать группу"}
                 </button>
             </div>
         </form>

@@ -3,6 +3,7 @@
 namespace App\GraphQL\Queries;
 
 use App\Models\Group;
+use Illuminate\Support\Facades\Auth;
 
 class GroupsQuery
 {

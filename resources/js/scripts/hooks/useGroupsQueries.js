@@ -12,6 +12,18 @@ export const useGroups = () => {
     });
 };
 
+export const useGroupStudents = (groupId) => {
+    return useQuery({
+        queryKey: ["groupStudents", groupId],
+        queryFn: async (groupId) => {
+            const response = await axios.get(
+                `/api/admin/groups/students?group_id=${groupId}`
+            );
+            return response.data.students;
+        },
+    });
+};
+
 export const useCreateGroup = () => {
     const queryClient = useQueryClient();
 
@@ -40,7 +52,6 @@ export const useUpdateGroup = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries(["groups"]);
-            window.location.reload();
         },
     });
 };
@@ -55,7 +66,6 @@ export const useDeleteGroup = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries(["groups"]);
-            window.location.reload();
         },
     });
 };

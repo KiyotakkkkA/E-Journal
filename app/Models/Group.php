@@ -15,4 +15,9 @@ class Group extends Model
     {
         return $this->hasMany(Student::class);
     }
+
+    public function history()
+    {
+        return $this->hasMany(GroupHistory::class);
+    }
 }
