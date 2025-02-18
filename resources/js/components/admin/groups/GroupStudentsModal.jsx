@@ -27,7 +27,7 @@ const GroupStudentsModal = ({ group, students, onClose, isOpen }) => {
                              border-b border-gray-200"
                 >
                     <h3 className="text-xl font-semibold text-gray-900">
-                        Студенты группы {group.name}
+                        Студенты группы - {group.name}
                     </h3>
                     <button
                         onClick={onClose}

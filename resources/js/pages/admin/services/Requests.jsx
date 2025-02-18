@@ -3,6 +3,7 @@ import MenuLayout from "../../../layouts/MenuLayout";
 import { Icon } from "@iconify/react";
 import AnimatedLoader from "../../../components/elements/AnimatedLoader";
 import { Link } from "react-router-dom";
+import axios from "../../../axios";
 
 const RequestCard = ({ request, onApprove, onReject }) => {
     return (
@@ -73,7 +74,7 @@ const RequestCard = ({ request, onApprove, onReject }) => {
     );
 };
 
-const Requests = ({ canViewAdminPanel }) => {
+const Requests = () => {
     const [requests, setRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -111,10 +112,15 @@ const Requests = ({ canViewAdminPanel }) => {
         }
     };
 
-    if (isLoading) return <AnimatedLoader className="mt-4" />;
+    if (isLoading)
+        return (
+            <MenuLayout>
+                <AnimatedLoader className="mt-4" />
+            </MenuLayout>
+        );
 
     return (
-        <MenuLayout canViewAdminPanel={canViewAdminPanel}>
+        <MenuLayout>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>

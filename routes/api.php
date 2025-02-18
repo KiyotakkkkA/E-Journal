@@ -18,12 +18,14 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
 
 Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
 
-    Route::prefix('groups')->group(function () {
-        Route::get('/students', [GroupController::class, 'getStudents']);
-    });
-
     Route::prefix('requests')->group(function () {
         Route::get('/', [StudentRequestController::class, 'getCount']);
         Route::get('/all', [StudentRequestController::class, 'adminIndex']);
+    });
+});
+
+Route::prefix('services')->middleware(['web', 'auth:sanctum'])->group(function () {
+    Route::prefix('groups')->group(function () {
+        Route::get('/students', [GroupController::class, 'getStudents']);
     });
 });

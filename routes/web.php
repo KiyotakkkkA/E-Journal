@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\StudentRequestController;
 use App\Http\Controllers\Api\GroupController;
+use Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson;
 
 Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
     Route::prefix('groups')->group(function () {
@@ -31,9 +32,29 @@ Route::middleware("web")->group(function () {
     Route::post("/logout", [AuthController::class, "logout"]);
 });
 
+
+Route::group([
+    'prefix' => 'graphql',
+    'middleware' => [
+        'web',
+        \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        AcceptJson::class,
+    ],
+], function () {
+    Route::post('/', [
+        \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLController::class,
+        '__invoke'
+    ]);
+});
+
 Route::get('/{path?}', function () {
     return Inertia::render('App');
 })->where('path', '.*');
+
+Route::get('/sanctum/csrf-cookie', function () {
+    $token = csrf_token();
+    return response()->json(['csrf_token' => $token]);
+})->middleware('web');
 
 
 require __DIR__.'/auth.php';

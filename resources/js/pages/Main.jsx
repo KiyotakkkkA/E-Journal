@@ -1,9 +1,9 @@
 import React from "react";
 import MenuLayout from "../layouts/MenuLayout";
 
-const Main = ({ canViewAdminPanel }) => {
+const Main = () => {
     return (
-        <MenuLayout canViewAdminPanel={canViewAdminPanel}>
+        <MenuLayout>
             <div>Main</div>
         </MenuLayout>
     );

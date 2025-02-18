@@ -1,7 +1,8 @@
 import { Icon } from "@iconify/react";
 import UserInfoCard from "./UserInfoCard";
-
-const UserCard = ({ userInfo, isStudent }) => {
+import { useAuth } from "../../contexts/AuthContext";
+const UserCard = ({ userInfo }) => {
+    const { roles } = useAuth();
     return (
         <div className="bg-white rounded-xl shadow-md p-6">
             <div className="flex items-start gap-6">
@@ -21,7 +22,7 @@ const UserCard = ({ userInfo, isStudent }) => {
             <hr className="my-4" />
             <div
                 className={`grid ${
-                    isStudent ? "grid-cols-3" : "grid-cols-2"
+                    roles.isStudent ? "grid-cols-3" : "grid-cols-2"
                 } gap-4 `}
             >
                 <UserInfoCard
@@ -34,7 +35,7 @@ const UserCard = ({ userInfo, isStudent }) => {
                     icon="mdi:clock"
                     value={new Date(userInfo.created_at).toLocaleDateString()}
                 />
-                {isStudent && (
+                {roles.isStudent && (
                     <UserInfoCard
                         title="Группа"
                         icon="mdi:shield-account"

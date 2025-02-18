@@ -66,4 +66,29 @@ class User extends Authenticatable
     {
         return $this->hasOne(StudentRequests::class, 'user_id');
     }
+
+    public function isAdmin()
+    {
+        return $this->hasPermissionTo('be_admin');
+    }
+
+    public function isTeacher()
+    {
+        return $this->hasPermissionTo('be_teacher');
+    }
+
+    public function isStudent()
+    {
+        return $this->hasPermissionTo('be_student');
+    }
+
+    public function isEmailVerified()
+    {
+        return $this->hasPermissionTo('be_email_verified');
+    }
+
+    public function isGuest()
+    {
+        return $this->hasPermissionTo('be_guest');
+    }
 }

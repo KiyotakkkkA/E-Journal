@@ -32,6 +32,7 @@ class AuthController extends Controller
             'name' => "Неизвестный",
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role_id' => 4,
         ]);
 
         Auth::attempt($request->only('email', 'password'), true);
@@ -79,12 +80,18 @@ class AuthController extends Controller
     public function checkAuth(Request $request)
     {
         if (Auth::check()) {
-            $canViewAdminPanel = Auth::user()->hasPermissionTo('view_admin_panel');
-            $isStudent = Auth::user()->hasPermissionTo('view_self_schedule');
+            $user = Auth::user();
+            $canViewAdminPanel = $user->hasPermissionTo('view_admin_panel');
             return response()->json([
                 'message' => 'User is authenticated', 'isAuthenticated' => true,
                 'canViewAdminPanel' => $canViewAdminPanel,
-                'isStudent' => $isStudent
+                'roles' => [
+                    'isStudent' => $user->isStudent(),
+                    'isTeacher' => $user->isTeacher(),
+                    'isAdmin' => $user->isAdmin(),
+                    'isEmailVerified' => $user->isEmailVerified(),
+                    'isGuest' => $user->isGuest()
+                ],
             ], 200);
         }
     }

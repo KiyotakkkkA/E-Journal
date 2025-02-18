@@ -10,8 +10,10 @@ import {
 } from "../scripts/hooks/useUserQueries";
 import { useGroups } from "../scripts/hooks/useGroupsQueries";
 import { useLogout } from "../scripts/hooks/useAuthQueries";
+import { useAuth } from "../contexts/AuthContext";
 
-const UserInfo = ({ isStudent }) => {
+const UserInfo = () => {
+    const { roles } = useAuth();
     const [isRequestNeeded, setIsRequestNeeded] = useState(false);
     const [requestData, setRequestData] = useState({
         name: "",
@@ -36,7 +38,6 @@ const UserInfo = ({ isStudent }) => {
     } = useUserRequests();
 
     const { data: groups = [], isLoading: isGroupsLoading } = useGroups();
-
     const {
         mutate: sendRequest,
         isPending: isRequestLoading,
@@ -62,10 +63,10 @@ const UserInfo = ({ isStudent }) => {
 
     return (
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <UserCard userInfo={userData?.user} isStudent={isStudent} />
+            <UserCard userInfo={userData?.user} isStudent={roles.isStudent} />
 
             {!isRequestNeeded &&
-                isStudent &&
+                roles.isEmailVerified &&
                 !userData?.user?.currentGroup &&
                 requests.pending.length === 0 &&
                 requests.approved.length === 0 &&

@@ -18,19 +18,47 @@ class RolesAndPermsSeeder extends Seeder
         $rolesArray = [
             [
                 'name' => 'Администратор',
-                'permissions' => ['view_admin_panel', 'make_schedule', 'make_users', 'view_all_schedule', 'view_all_groups', 'view_all_groups_history']
+                'permissions' => ['be_admin', 'view_admin_panel', 'make_schedule', 'make_users', 'view_all_schedule', 'view_all_groups', 'view_all_groups_history', 'make_groups']
             ],
             [
                 'name' => 'Преподаватель',
-                'permissions' => ['view_all_schedule', 'make_attendance', 'view_all_groups']
+                'permissions' => ['be_teacher', 'view_all_schedule', 'make_attendance', 'view_all_groups']
             ],
             [
                 'name' => 'Студент',
-                'permissions' => ['view_self_schedule', 'view_group_history']
-            ]
+                'permissions' => ['be_student', 'view_self_schedule', 'view_group_history']
+            ],
+            [
+                'name' => 'Подтверждённый пользователь',
+                'permissions' => ['be_email_verified']
+            ],
+            [
+                'name' => 'Гость',
+                'permissions' => ['be_guest']
+            ],
         ];
 
         $permissionsArray = [
+            [
+                'name' => 'be_guest',
+                'description' => 'Является гостём'
+            ],
+            [
+                'name' => 'be_email_verified',
+                'description' => 'Является подтверждённым пользователем'
+            ],
+            [
+                'name' => 'be_student',
+                'description' => 'Является студентом'
+            ],
+            [
+                'name' => 'be_teacher',
+                'description' => 'Является преподавателем'
+            ],
+            [
+                'name' => 'be_admin',
+                'description' => 'Является администратором'
+            ],
             [
                 'name' => 'view_self_schedule',
                 'description' => 'Может просматривать расписание и посещаемость своей группы'
@@ -66,6 +94,10 @@ class RolesAndPermsSeeder extends Seeder
             [
                 'name' => 'make_users',
                 'description' => 'Может создавать и редактировать пользователей'
+            ],
+            [
+                'name' => 'make_groups',
+                'description' => 'Может создавать и редактировать учебные группы'
             ],
 
         ];

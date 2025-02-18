@@ -1,5 +1,5 @@
 import { jsonToGraphQLQuery } from "json-to-graphql-query";
-import request from "graphql-request";
+import axios from "../axios";
 
 const GRAPHQL_ENDPOINT = `${window.location.origin}/graphql`;
 
@@ -13,14 +13,12 @@ const graphqlFetch = async (table, columns, where) => {
         ...query.query[table],
         ...columns,
     };
-    query = jsonToGraphQLQuery(query);
-    try {
-        const data = await request(GRAPHQL_ENDPOINT, query);
-        return data[table] || [];
-    } catch (e) {
-        console.error(e);
-        return [];
-    }
+    const queryString = jsonToGraphQLQuery(query);
+
+    const { data } = await axios.post(GRAPHQL_ENDPOINT, {
+        query: queryString,
+    });
+    return data.data[table] || [];
 };
 
 const getGroups = async () => {
@@ -29,6 +27,11 @@ const getGroups = async () => {
         name: true,
         max_students: true,
         students_count: true,
+        students: {
+            id: true,
+            name: true,
+            email: true,
+        },
     });
     return { data: { groups } };
 };

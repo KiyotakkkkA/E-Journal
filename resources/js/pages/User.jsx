@@ -1,10 +1,10 @@
 import React from "react";
 import MenuLayout from "../layouts/MenuLayout";
 import UserInfo from "../components/UserInfo";
-const UserPage = ({ canViewAdminPanel, isStudent }) => {
+const UserPage = () => {
     return (
-        <MenuLayout canViewAdminPanel={canViewAdminPanel}>
-            <UserInfo isStudent={isStudent} />
+        <MenuLayout>
+            <UserInfo />
         </MenuLayout>
     );
 };

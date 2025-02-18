@@ -9,17 +9,29 @@ export const useGroups = () => {
             const response = await getGroups();
             return response.data.groups;
         },
+        retry: 1,
+        retryDelay: 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        onError: (error) => {
+            console.error("Error fetching groups:", error);
+        },
     });
 };
 
 export const useGroupStudents = (groupId) => {
-    return useQuery({
-        queryKey: ["groupStudents", groupId],
-        queryFn: async (groupId) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationKey: ["groupStudents", groupId],
+        mutationFn: async () => {
             const response = await axios.get(
-                `/api/admin/groups/students?group_id=${groupId}`
+                `/api/services/groups/students?group_id=${groupId}`
             );
             return response.data.students;
+        },
+        onSuccess: (data) => {
+            queryClient.setQueryData(["groupStudents", groupId], data);
         },
     });
 };

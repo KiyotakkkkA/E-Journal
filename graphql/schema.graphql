@@ -6,8 +6,10 @@ scalar DateTime
 type Query {
     groups: [Group!]!
         @field(resolver: "App\\GraphQL\\Queries\\GroupsQuery@resolve")
+        @guard(with: ["web"])
     group_history(group_id: ID!): [GroupHistory!]!
         @field(resolver: "App\\GraphQL\\Queries\\GroupHistoryQuery@resolve")
+        @guard(with: ["web"])
 }
 
 type Group {
@@ -16,6 +18,13 @@ type Group {
     max_students: Int!
     students_count: Int
     is_active: Boolean!
+    students: [GroupStudents] @canViewStudents
+}
+
+type GroupStudents {
+    id: ID!
+    name: String!
+    email: String!
 }
 
 type GroupHistory {

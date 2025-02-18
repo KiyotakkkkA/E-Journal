@@ -91,6 +91,7 @@ class StudentRequestController extends Controller
                 'group_id' => $request->group_id,
             ]);
             $request->user->name = $request->name;
+            $request->user->role_id = 3;
             $request->user->save();
 
             return response()->json(['message' => 'Request approved']);

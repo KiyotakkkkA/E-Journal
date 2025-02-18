@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Menu,
     MenuButton,
@@ -15,12 +15,28 @@ import {
 import DeleteGroupModal from "../modals/DeleteGroupModal";
 import EditGroupModal from "../modals/EditGroupModal";
 
-export default function GroupDropdown({ group }) {
+export default function GroupDropdown({ group, disabled, onOperationStart }) {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
 
-    const { mutate: updateGroup } = useUpdateGroup();
-    const { mutate: deleteGroup } = useDeleteGroup();
+    const { mutate: updateGroup, isPending: isUpdating } = useUpdateGroup();
+    const { mutate: deleteGroup, isPending: isDeleting } = useDeleteGroup();
+
+    const isLoading = isUpdating || isDeleting;
+
+    useEffect(() => {
+        if (isUpdating) {
+            onOperationStart("editing");
+        } else if (isDeleting) {
+            onOperationStart("deleting");
+        } else {
+            const timer = setTimeout(() => {
+                onOperationStart(null);
+            }, 500);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isUpdating, isDeleting]);
 
     return (
         <>
@@ -30,8 +46,16 @@ export default function GroupDropdown({ group }) {
                 onClick={(e) => e.stopPropagation()}
             >
                 <MenuButton
-                    className="text-gray-400 hover:text-gray-600
-                                     transition-colors duration-200 p-1"
+                    className={`
+                        text-gray-400 hover:text-gray-600
+                        transition-colors duration-200 p-1
+                        ${
+                            disabled || isLoading
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                        }
+                    `}
+                    disabled={disabled || isLoading}
                 >
                     <Icon icon="mdi:dots-vertical" className="text-xl" />
                 </MenuButton>
@@ -54,16 +78,26 @@ export default function GroupDropdown({ group }) {
                             <MenuItem>
                                 {({ active }) => (
                                     <button
+                                        className={`
+                                            ${
+                                                active
+                                                    ? "bg-gray-50 text-gray-900"
+                                                    : "text-gray-700"
+                                            }
+                                            w-full text-left px-4 py-2 text-sm
+                                            ${
+                                                isLoading
+                                                    ? "opacity-50 cursor-not-allowed"
+                                                    : ""
+                                            }
+                                            flex items-center
+                                        `}
                                         onClick={() => setShowEditModal(true)}
-                                        className={`${
-                                            active
-                                                ? "bg-gray-50 text-gray-900"
-                                                : "text-gray-700"
-                                        } flex w-full items-center px-4 py-2 text-sm`}
+                                        disabled={isLoading}
                                     >
                                         <Icon
                                             icon="mdi:pencil"
-                                            className="mr-2 text-gray-400"
+                                            className="mr-2 text-gray-400 w-5 h-5"
                                         />
                                         Редактировать
                                     </button>
@@ -73,15 +107,25 @@ export default function GroupDropdown({ group }) {
                                 {({ active }) => (
                                     <button
                                         onClick={() => setShowDeleteModal(true)}
-                                        className={`${
-                                            active
-                                                ? "bg-red-50 text-red-700"
-                                                : "text-red-600"
-                                        } flex w-full items-center px-4 py-2 text-sm`}
+                                        className={`
+                                            ${
+                                                active
+                                                    ? "bg-red-50 text-red-700"
+                                                    : "text-red-600"
+                                            }
+                                            w-full px-4 py-2 text-sm
+                                            ${
+                                                isLoading
+                                                    ? "opacity-50 cursor-not-allowed"
+                                                    : ""
+                                            }
+                                            flex items-center
+                                        `}
+                                        disabled={isLoading}
                                     >
                                         <Icon
                                             icon="mdi:delete"
-                                            className="mr-2"
+                                            className="mr-2 w-5 h-5"
                                         />
                                         Удалить
                                     </button>
