@@ -27,7 +27,7 @@ GRAPHQL;
             try {
                 $user = Auth::guard('web')->user();
 
-                if (!$user || $user->hasPermissionTo('make_groups')) {
+                if (!$user || $user->hasPermissionTo('make_groups') || $user->student->getActiveGroup() === null) {
                     return [];
                 }
 

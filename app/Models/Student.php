@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use App\Models\StudentRequests;
 
 class Student extends Model
 {
@@ -35,9 +36,14 @@ class Student extends Model
         return $this->belongsTo(Group::class);
     }
 
+    public function getActiveGroup()
+    {
+        return $this->group()->where('is_active', true)->first();
+    }
+
     public function requests()
     {
-        return $this->hasMany(StudentRequest::class);
+        return $this->hasMany(StudentRequests::class, 'user_id', 'user_id');
     }
 
     public function getApprovedRequest()

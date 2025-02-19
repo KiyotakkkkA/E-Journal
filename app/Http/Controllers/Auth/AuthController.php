@@ -82,9 +82,16 @@ class AuthController extends Controller
         if (Auth::check()) {
             $user = Auth::user();
             $canViewAdminPanel = $user->hasPermissionTo('view_admin_panel');
+            $student = $user->student;
+            $isInGroup = false;
+            if ($student) {
+                $isInGroup = $student->getActiveGroup() !== null;
+            }
+
             return response()->json([
                 'message' => 'User is authenticated', 'isAuthenticated' => true,
                 'canViewAdminPanel' => $canViewAdminPanel,
+                'isInGroup' => $isInGroup,
                 'roles' => [
                     'isStudent' => $user->isStudent(),
                     'isTeacher' => $user->isTeacher(),

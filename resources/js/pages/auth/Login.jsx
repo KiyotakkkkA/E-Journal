@@ -2,14 +2,12 @@ import React, { useState, useRef } from "react";
 import InputWithIcon from "../../components/elements/InputWithIcon";
 import { validateEmail } from "../../scripts/validation";
 import { useLogin } from "../../scripts/hooks/useAuthQueries";
+import { loginStore } from "../../stores/loginStore";
+import { observer } from "mobx-react-lite";
 
-export default function Login() {
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-        remember: false,
-    });
-    const [serverErrors, setServerErrors] = useState({});
+const Login = observer(() => {
+    const loginForm = loginStore.getLoginForm();
+    const loginErrors = loginStore.getErrors();
 
     const {
         mutate: login,
@@ -19,17 +17,14 @@ export default function Login() {
     } = useLogin();
 
     const handleChange = (name, value, additionalParams = {}) => {
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        loginStore.setLoginForm(name, value);
 
         const validationRules = {
             email: () => validateEmail(value),
         };
 
         if (validationRules[name]) {
-            setServerErrors((prev) => ({
-                ...prev,
-                [name]: validationRules[name](),
-            }));
+            loginStore.setErrors(name, validationRules[name]());
         }
     };
 
@@ -47,7 +42,7 @@ export default function Login() {
                 className="p-6 space-y-4"
                 onSubmit={(e) => {
                     e.preventDefault();
-                    login(formData);
+                    login(loginForm);
                 }}
             >
                 <InputWithIcon
@@ -55,9 +50,9 @@ export default function Login() {
                     type="email"
                     id="email"
                     placeholder="Введите электронную почту..."
-                    value={formData.email}
+                    value={loginForm.email}
                     onChange={(e) => handleChange("email", e.target.value)}
-                    error={serverErrors.email}
+                    error={loginErrors.email}
                     autoComplete="email"
                 />
 
@@ -66,7 +61,7 @@ export default function Login() {
                     type="password"
                     id="password"
                     placeholder="Введите пароль..."
-                    value={formData.password}
+                    value={loginForm.password}
                     onChange={(e) => handleChange("password", e.target.value)}
                     autoComplete="password"
                     appendContent={
@@ -83,7 +78,7 @@ export default function Login() {
                     <input
                         type="checkbox"
                         id="remember"
-                        checked={formData.remember}
+                        checked={loginForm.remember}
                         onChange={(e) =>
                             handleChange("remember", e.target.checked)
                         }
@@ -117,4 +112,6 @@ export default function Login() {
             </form>
         </div>
     );
-}
+});
+
+export default Login;

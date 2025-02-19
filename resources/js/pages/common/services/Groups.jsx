@@ -26,7 +26,7 @@ const Groups = () => {
 
     const { data: groups = [], isLoading, error } = useGroups();
 
-    const { roles } = useAuth();
+    const { roles, isInGroup } = useAuth();
 
     const allGroups = useMemo(() => {
         if (creatingGroup) {
@@ -74,7 +74,7 @@ const Groups = () => {
         );
     }
 
-    if (!groups?.length) {
+    if ((!isInGroup || !groups?.length) && !roles.isAdmin) {
         return (
             <MenuLayout>
                 <div className="text-center text-gray-500">

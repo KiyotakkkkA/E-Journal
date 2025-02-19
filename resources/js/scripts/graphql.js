@@ -36,4 +36,14 @@ const getGroups = async () => {
     return { data: { groups } };
 };
 
-export { getGroups };
+const getGroupHistory = async () => {
+    const history = await graphqlFetch("group_history", {
+        id: true,
+        group_id: true,
+        created_at: true,
+        status: true,
+    });
+    return { data: { history } };
+};
+
+export { getGroups, getGroupHistory };

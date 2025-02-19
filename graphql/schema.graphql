@@ -7,7 +7,7 @@ type Query {
     groups: [Group!]!
         @field(resolver: "App\\GraphQL\\Queries\\GroupsQuery@resolve")
         @guard(with: ["web"])
-    group_history(group_id: ID!): [GroupHistory!]!
+    group_history: [GroupHistory!]!
         @field(resolver: "App\\GraphQL\\Queries\\GroupHistoryQuery@resolve")
         @guard(with: ["web"])
 }

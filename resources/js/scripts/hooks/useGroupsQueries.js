@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "../../axios";
-import { getGroups } from "../graphql";
+import { getGroups, getGroupHistory } from "../graphql";
 
 export const useGroups = () => {
     return useQuery({
@@ -32,6 +32,16 @@ export const useGroupStudents = (groupId) => {
         },
         onSuccess: (data) => {
             queryClient.setQueryData(["groupStudents", groupId], data);
+        },
+    });
+};
+
+export const useGroupHistory = () => {
+    return useQuery({
+        queryKey: ["groupHistory"],
+        queryFn: async () => {
+            const response = await getGroupHistory();
+            return response.data.history;
         },
     });
 };

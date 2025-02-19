@@ -26,8 +26,8 @@ class UserController extends Controller
                     'email' => $user->email,
                     'role' => $user->role,
                     'created_at' => $user->created_at,
-                    'group' => $user->student?->group ? [
-                        'name' => $user->student->group->name
+                    'group' => $user->student?->getActiveGroup() ? [
+                        'name' => $user->student->getActiveGroup()->name
                     ] : null
                 ],
             ];

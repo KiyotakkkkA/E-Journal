@@ -15,7 +15,7 @@ class StudentRequestController extends Controller
         $user = Auth::user();
         $reqPending = StudentRequests::where('user_id', $user->id)->where('status', 'pending')->get();
         $reqApproved = StudentRequests::where('user_id', $user->id)->where('status', 'approved')->get();
-        if ($reqPending->count() >= 1 || $reqApproved->count() >= 1) {
+        if (($reqPending->count() >= 1 || $reqApproved->count() >= 1) && ($user->isStudent() && $user->student->getActiveGroup() !== null)) {
             return response()->json(['error' => 'Вы уже отправили заявку на вступление в группу', 'status' => false]);
         }
         StudentRequests::create([
@@ -46,11 +46,17 @@ class StudentRequestController extends Controller
             ->where('status', 'rejected')
             ->get();
 
+        $reqGroupDeleted = StudentRequests::with('group')
+            ->where('user_id', $user->id)
+            ->where('status', 'group_deleted')
+            ->get();
+
         return response()->json([
             'requests' => [
                 'pending' => $reqPending,
                 'approved' => $reqApproved,
                 'rejected' => $reqRejected,
+                'group_deleted' => $reqGroupDeleted,
             ]
         ]);
     }
@@ -81,18 +87,25 @@ class StudentRequestController extends Controller
     {
         $user = Auth::user();
         if ($user->hasPermissionTo('view_admin_panel')) {
-            $request->update(['status' => 'approved']);
-            $request->group->students_count += 1;
-            $request->group->save();
+            if ($request->user->isEmailVerified()) {
+                $request->update(['status' => 'approved']);
+                $request->group->students_count += 1;
+                $request->group->save();
 
-            Student::create([
-                'student_code' => Student::generateUniqueCode(),
-                'user_id' => $request->user_id,
-                'group_id' => $request->group_id,
-            ]);
-            $request->user->name = $request->name;
-            $request->user->role_id = 3;
-            $request->user->save();
+                Student::create([
+                    'student_code' => Student::generateUniqueCode(),
+                    'user_id' => $request->user_id,
+                    'group_id' => $request->group_id,
+                ]);
+                $request->user->name = $request->name;
+                $request->user->role_id = 3;
+                $request->user->save();
+            }
+            if ($request->user->isStudent() && ($request->user->student->getActiveGroup() === null)) {
+                $request->update(['status' => 'approved']);
+                $request->user->student->group_id = $request->group_id;
+                $request->user->student->save();
+            }
 
             return response()->json(['message' => 'Request approved']);
         }

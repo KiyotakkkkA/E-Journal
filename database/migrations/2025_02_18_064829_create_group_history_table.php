@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('group_history', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('group_id')->constrained('groups');
+            $table->foreignId('group_id')->constrained('groups')->nullable();
             $table->enum('status', ['created', 'deleted', 'restored', 'renamed']);
             $table->timestamps();
         });

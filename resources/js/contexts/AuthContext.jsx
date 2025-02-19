@@ -6,6 +6,7 @@ export function AuthProvider({ children, auth }) {
     const value = {
         isAuthenticated: auth.isAuthenticated,
         canViewAdminPanel: auth.canViewAdminPanel,
+        isInGroup: auth.isInGroup,
         roles: {
             isStudent: auth.roles?.isStudent,
             isTeacher: auth.roles?.isTeacher,

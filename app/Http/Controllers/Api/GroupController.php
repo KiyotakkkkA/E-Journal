@@ -21,7 +21,7 @@ class GroupController extends Controller
             'max_students' => 'required|integer|min:1|max:30',
         ]);
 
-        $group = Group::create($validated);
+        $group = Group::makeCreated($validated);
 
         return response()->json(['group' => $group], 201);
     }
@@ -44,24 +44,17 @@ class GroupController extends Controller
         if (!Auth::user()->hasPermissionTo('make_groups')) {
             return response()->json(['message' => 'У вас нет прав на редактирование группы'], 403);
         }
-        $group->update($request->all());
+        $group->makeUpdated($request->all());
         return response()->json(['group' => $group]);
     }
 
     public function delete(Group $group)
     {
-
         if (!Auth::user()->hasPermissionTo('make_groups')) {
             return response()->json(['message' => 'У вас нет прав на удаление группы'], 403);
         }
 
-        $students = $group->students;
-        foreach ($students as $student) {
-            $student->group_id = null;
-            $student->getApprovedRequest()->status = 'group_deleted';
-            $student->save();
-        }
-        $group->update(['is_active' => false]);
+        $group->deleteTransactions();
         return response()->json(['message' => 'Group deleted successfully']);
     }
 }

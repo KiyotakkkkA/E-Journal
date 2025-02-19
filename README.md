@@ -17,6 +17,7 @@
   <img src="https://img.shields.io/badge/React%20Query-FF4154?style=for-the-badge&logo=react%20query&logoColor=white" alt="React Query"/>
   <img src="https://img.shields.io/badge/React%20Hook%20Form-EC4A0A?style=for-the-badge&logo=react%20hook%20form&logoColor=white" alt="React Hook Form"/>
   <img src="https://img.shields.io/badge/React%20Icons-FF4154?style=for-the-badge&logo=react%20icons&logoColor=white" alt="React Icons"/>
+  <img src="https://img.shields.io/badge/MobX-FF4154?style=for-the-badge&logo=mobx&logoColor=white" alt="MobX"/>
 </div>
     
 ## 📋 Описание

@@ -6,18 +6,12 @@ import {
     validatePassword,
     validatePasswordConfirmation,
 } from "../../scripts/validation";
+import { registerStore } from "../../stores/registerStore";
+import { observer } from "mobx-react-lite";
 
-export default function Register() {
-    const [errors, setErrors] = useState({
-        email: "",
-        password_confirmation: "",
-    });
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-        password_confirmation: "",
-        agree: false,
-    });
+const Register = observer(() => {
+    const registerForm = registerStore.getRegisterForm();
+    const registerErrors = registerStore.getErrors();
 
     const {
         mutate: register,
@@ -27,7 +21,7 @@ export default function Register() {
     } = useRegister();
 
     const handleChange = (name, value, additionalParams = {}) => {
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        registerStore.setRegisterForm(name, value);
 
         const validationRules = {
             email: () => validateEmail(value),
@@ -37,20 +31,17 @@ export default function Register() {
         };
 
         if (validationRules[name]) {
-            setErrors((prev) => ({
-                ...prev,
-                [name]: validationRules[name](),
-            }));
+            registerStore.setErrors(name, validationRules[name]());
         }
 
-        if (name === "password" && formData.password_confirmation) {
-            setErrors((prev) => ({
-                ...prev,
-                password_confirmation: validatePasswordConfirmation(
+        if (name === "password" && registerForm.password_confirmation) {
+            registerStore.setErrors(
+                "password_confirmation",
+                validatePasswordConfirmation(
                     value,
-                    formData.password_confirmation
-                ),
-            }));
+                    registerForm.password_confirmation
+                )
+            );
         }
     };
 
@@ -68,7 +59,7 @@ export default function Register() {
                 className="p-6 space-y-4"
                 onSubmit={(e) => {
                     e.preventDefault();
-                    register(formData);
+                    register(registerForm);
                 }}
             >
                 <InputWithIcon
@@ -76,9 +67,9 @@ export default function Register() {
                     type="text"
                     id="email"
                     placeholder="Введите электронную почту..."
-                    value={formData.email}
+                    value={registerForm.email}
                     onChange={(e) => handleChange("email", e.target.value)}
-                    error={errors.email}
+                    error={registerErrors.email}
                     autoComplete="email"
                 />
                 <div className="space-y-1">
@@ -87,14 +78,14 @@ export default function Register() {
                         type="password"
                         id="password"
                         placeholder="Введите пароль..."
-                        value={formData.password}
+                        value={registerForm.password}
                         onChange={(e) =>
                             handleChange("password", e.target.value)
                         }
-                        error={errors.password}
+                        error={registerErrors.password}
                         autoComplete="password"
                     />
-                    {formData.password.length === 0 && (
+                    {registerForm.password.length === 0 && (
                         <span className="text-xs text-gray-500 pl-2">
                             Пароль должен содержать минимум 8 символов
                         </span>
@@ -105,13 +96,13 @@ export default function Register() {
                     type="password"
                     id="password_confirmation"
                     placeholder="Повторите пароль..."
-                    value={formData.password_confirmation}
+                    value={registerForm.password_confirmation}
                     onChange={(e) =>
                         handleChange("password_confirmation", e.target.value, {
-                            password: formData.password,
+                            password: registerForm.password,
                         })
                     }
-                    error={errors.password_confirmation}
+                    error={registerErrors.password_confirmation}
                 />
                 <div className="flex items-center space-x-2">
                     <input
@@ -150,4 +141,6 @@ export default function Register() {
             </form>
         </div>
     );
-}
+});
+
+export default Register;
