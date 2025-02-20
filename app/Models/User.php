@@ -91,4 +91,15 @@ class User extends Authenticatable
     {
         return $this->hasPermissionTo('be_guest');
     }
+
+    public function assignRole(String $roleName)
+    {
+        $this->role()->associate(Role::where('name', $roleName)->first());
+        $this->save();
+    }
+
+    public function hasEmailVerified()
+    {
+        return $this->email_verified_at !== null;
+    }
 }

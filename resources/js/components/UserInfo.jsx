@@ -15,6 +15,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useGroupHistory } from "../scripts/hooks/useGroupsQueries";
 import { userProfileStore } from "../stores/userProfileStore";
 import { observer } from "mobx-react-lite";
+import VerifyEmailButton from "./elements/VerifyEmailButton";
 
 const UserInfo = observer(() => {
     const auth = useAuth();
@@ -103,7 +104,7 @@ const UserInfo = observer(() => {
 
     const canWeJoinToGroup = () => {
         // Если пользователь админ, то он не может присоединиться к группе
-        if (roles.isAdmin) {
+        if (roles.isAdmin || roles.isGuest || roles.isTeacher) {
             return false;
         }
         // Активная форма заявки
@@ -151,8 +152,8 @@ const UserInfo = observer(() => {
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <UserCard userInfo={user?.user} isStudent={roles.isStudent} />
 
-            {canWeJoinToGroup() && (
-                <div className="mt-4">
+            <div className="flex flex-wrap items-center gap-4 mt-4">
+                {canWeJoinToGroup() && (
                     <button
                         className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all duration-200"
                         onClick={() =>
@@ -161,8 +162,18 @@ const UserInfo = observer(() => {
                     >
                         Прикрепиться к группе
                     </button>
-                </div>
-            )}
+                )}
+
+                <VerifyEmailButton />
+
+                <button
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-200 disabled:opacity-50 transition-all"
+                    onClick={() => logout()}
+                    disabled={isLogoutLoading || isLogoutSuccess}
+                >
+                    {isLogoutLoading ? "Выход..." : "Выйти"}
+                </button>
+            </div>
 
             {isRequestNeeded && (
                 <StudentRequestForm
@@ -181,14 +192,6 @@ const UserInfo = observer(() => {
                     <GroupHistoryList history={history} />
                 </div>
             </div>
-
-            <button
-                className="btn btn-danger mt-4"
-                onClick={() => logout()}
-                disabled={isLogoutLoading || isLogoutSuccess}
-            >
-                Выйти
-            </button>
         </div>
     );
 });

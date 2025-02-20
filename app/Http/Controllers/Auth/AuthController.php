@@ -32,7 +32,7 @@ class AuthController extends Controller
             'name' => "Неизвестный",
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => 4,
+            'role_id' => 5,
         ]);
 
         Auth::attempt($request->only('email', 'password'), true);
@@ -92,6 +92,7 @@ class AuthController extends Controller
                 'message' => 'User is authenticated', 'isAuthenticated' => true,
                 'canViewAdminPanel' => $canViewAdminPanel,
                 'isInGroup' => $isInGroup,
+                'hasVerifiedEmail' => $user->hasEmailVerified(),
                 'roles' => [
                     'isStudent' => $user->isStudent(),
                     'isTeacher' => $user->isTeacher(),

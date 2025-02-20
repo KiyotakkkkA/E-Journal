@@ -10,6 +10,7 @@ import Requests from "./pages/admin/services/Requests";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import AdminMenu from "./pages/admin/AdminMenu";
+import Teachers from "./pages/admin/services/Teachers";
 import UserPage from "./pages/User";
 import NotFound from "./pages/NotFound";
 import Main from "./pages/Main";
@@ -35,6 +36,14 @@ export default function BrowseRoutes() {
                     element={
                         <AdminRoute>
                             <Requests />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/admin/teachers"
+                    element={
+                        <AdminRoute>
+                            <Teachers />
                         </AdminRoute>
                     }
                 />

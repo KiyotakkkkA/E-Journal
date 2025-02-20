@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "../../axios";
+import { toast } from "react-hot-toast";
 
 export const useUserInfo = () => {
     return useQuery({
@@ -33,6 +34,40 @@ export const useSendRequest = () => {
             queryClient.invalidateQueries(["userRequests"]);
             queryClient.invalidateQueries(["user"]);
             window.location.reload();
+        },
+    });
+};
+
+export const useSendVerificationEmail = () => {
+    return useMutation({
+        mutationFn: async () =>
+            await axios.post("/email/verification-notification"),
+        onSuccess: () => {
+            toast.success("Код подтверждения отправлен на вашу почту");
+        },
+        onError: (error) => {
+            toast.error(
+                error.response?.data?.message ||
+                    "Не удалось отправить код подтверждения"
+            );
+        },
+    });
+};
+
+export const useVerifyEmail = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (code) => await axios.post("/email/verify", { code }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["user"] });
+            toast.success("Email успешно подтвержден");
+            window.location.reload();
+        },
+        onError: (error) => {
+            toast.error(
+                error.response?.data?.message || "Не удалось подтвердить email"
+            );
         },
     });
 };

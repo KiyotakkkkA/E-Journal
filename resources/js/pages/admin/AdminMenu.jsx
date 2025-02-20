@@ -23,6 +23,13 @@ const AdminMenu = () => {
             ref: "/admin/schedule",
             color: "#9C27B0",
         },
+        {
+            title: "Преподаватели",
+            description: "Управление преподавателями",
+            icon: "mdi:human-male-board",
+            ref: "/admin/teachers",
+            color: "#FF9800",
+        },
     ];
 
     useEffect(() => {

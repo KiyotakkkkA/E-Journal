@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\StudentRequestController;
 use App\Http\Controllers\Api\GroupController;
 use Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson;
+use App\Http\Controllers\EmailVerificationController;
 
 Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
     Route::prefix('groups')->group(function () {
@@ -30,6 +31,12 @@ Route::middleware("web")->group(function () {
     Route::post("/register", [AuthController::class, "register"]);
     Route::post("/login", [AuthController::class, "login"]);
     Route::post("/logout", [AuthController::class, "logout"]);
+
+    Route::prefix('email')->group(function () {
+        Route::post('/verify', [EmailVerificationController::class, 'verify']);
+        Route::post('/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail']);
+    });
+
 });
 
 
