@@ -10,6 +10,11 @@ type Query {
     group_history: [GroupHistory!]!
         @field(resolver: "App\\GraphQL\\Queries\\GroupHistoryQuery@resolve")
         @guard(with: ["web"])
+    institutes: [Institute!]!
+        @field(resolver: "App\\GraphQL\\Queries\\InstitutesQuery@resolve")
+    cafedras(institute_id: ID): [Cafedra!]!
+        @field(resolver: "App\\GraphQL\\Queries\\CafedrasQuery@resolve")
+    disciplines: [Discipline!]! @all
 }
 
 type Group {
@@ -32,4 +37,21 @@ type GroupHistory {
     group_id: ID!
     status: String!
     created_at: DateTime!
+}
+
+type Discipline {
+    id: ID!
+    name: String!
+}
+
+type Institute {
+    id: ID!
+    name: String!
+    count_cafedras: Int!
+}
+
+type Cafedra {
+    id: ID!
+    name: String!
+    count_teachers: Int!
 }

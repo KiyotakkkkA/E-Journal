@@ -1,11 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "../../axios";
 
-export const useTeachers = () => {
+export const useTeachers = (verified) => {
     return useQuery({
-        queryKey: ["teachers"],
+        queryKey: ["teachers", verified],
         queryFn: async () => {
-            const response = await axios.get("/api/admin/teachers");
+            const response = await axios.get(
+                `/api/admin/teachers?verified=${verified}`
+            );
             return response.data;
         },
     });

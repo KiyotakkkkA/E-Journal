@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Mail\EmailVerification;
+use App\Models\Teacher;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\Log;
 class EmailVerificationController extends Controller
 {
     public function sendVerificationEmail(Request $request)
@@ -75,6 +76,18 @@ class EmailVerificationController extends Controller
             if (!$user->hasPermissionTo('be_teacher')) {
                 $user->role_id = 4;
                 $user->save();
+            }
+            else {
+                try {
+                    Teacher::create([
+                        'position' => 'Преподаватель',
+                        'degree' => '-',
+                        'user_id' => $user->id,
+                        'cafedra_id' => null,
+                    ]);
+                } catch (\Exception $e) {
+                   Log::error($e->getMessage());
+                }
             }
 
             return response()->json([

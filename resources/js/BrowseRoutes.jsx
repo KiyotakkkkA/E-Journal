@@ -7,6 +7,8 @@ import AuthorizedRoute from "./components/routes/AuthorizedRoute";
 import Groups from "./pages/common/services/Groups";
 import ServicesMenu from "./pages/common/ServicesMenu";
 import Requests from "./pages/admin/services/Requests";
+import OrgStructure from "./pages/admin/services/OrgStructure";
+import Disciplines from "./pages/admin/services/Disciplines";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import AdminMenu from "./pages/admin/AdminMenu";
@@ -44,6 +46,22 @@ export default function BrowseRoutes() {
                     element={
                         <AdminRoute>
                             <Teachers />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/admin/disciplines"
+                    element={
+                        <AdminRoute>
+                            <Disciplines />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/admin/structure"
+                    element={
+                        <AdminRoute>
+                            <OrgStructure />
                         </AdminRoute>
                     }
                 />

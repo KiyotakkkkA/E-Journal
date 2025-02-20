@@ -30,6 +30,20 @@ const AdminMenu = () => {
             ref: "/admin/teachers",
             color: "#FF9800",
         },
+        {
+            title: "Дисциплины",
+            description: "Управление дисциплинами",
+            icon: "mdi:book-open-variant",
+            ref: "/admin/disciplines",
+            color: "#86B32D",
+        },
+        {
+            title: "Структура организации",
+            description: "Управление структурами организации",
+            icon: "mdi:school",
+            ref: "/admin/structure",
+            color: "#CD0074",
+        },
     ];
 
     useEffect(() => {

@@ -14,7 +14,7 @@ export default function Teachers() {
     const [isDeleteFormOpen, setIsDeleteFormOpen] = useState(false);
     const [teacher, setTeacher] = useState(null);
 
-    const { data: teachers, isLoading } = useTeachers();
+    const { data: teachers, isLoading } = useTeachers(false);
 
     const handleEdit = (teacher) => {
         setTeacher(teacher);

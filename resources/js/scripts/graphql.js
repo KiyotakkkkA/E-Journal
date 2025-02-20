@@ -46,4 +46,40 @@ const getGroupHistory = async () => {
     return { data: { history } };
 };
 
-export { getGroups, getGroupHistory };
+const getInstitutes = async () => {
+    const institutes = await graphqlFetch("institutes", {
+        id: true,
+        name: true,
+        count_cafedras: true,
+    });
+    return { data: { institutes } };
+};
+
+const getCafedras = async (instituteId = null) => {
+    const cafedras = await graphqlFetch(
+        "cafedras",
+        {
+            id: true,
+            name: true,
+            count_teachers: true,
+        },
+        instituteId ? { institute_id: instituteId } : null
+    );
+    return { data: { cafedras } };
+};
+
+const getDisciplines = async () => {
+    const disciplines = await graphqlFetch("disciplines", {
+        id: true,
+        name: true,
+    });
+    return { data: { disciplines } };
+};
+
+export {
+    getGroups,
+    getGroupHistory,
+    getInstitutes,
+    getCafedras,
+    getDisciplines,
+};

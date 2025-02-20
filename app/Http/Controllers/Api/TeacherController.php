@@ -1,20 +1,28 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class TeacherController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return User::select(['roles.name', 'users.id', 'users.email', 'users.email_verified_at', 'users.name'])
+
+        $state = $request->query('verified');
+
+        $query = User::select(['roles.name', 'users.id', 'users.email', 'users.email_verified_at', 'users.name'])
             ->join('roles', 'users.role_id', '=', 'roles.id')
-            ->where('roles.name', 'Преподаватель')
-            ->get();
+            ->where('roles.name', 'Преподаватель');
+
+        if ($state === 'true') {
+            $query->where('users.email_verified_at', '!=', null);
+        }
+
+        return $query->get();
     }
 
     public function store(Request $request)

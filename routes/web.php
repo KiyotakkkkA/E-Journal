@@ -5,7 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\StudentRequestController;
+use App\Http\Controllers\Api\StudentRequestController;
 use App\Http\Controllers\Api\GroupController;
 use Nuwave\Lighthouse\Support\Http\Middleware\AcceptJson;
 use App\Http\Controllers\EmailVerificationController;
