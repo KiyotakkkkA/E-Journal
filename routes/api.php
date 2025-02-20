@@ -27,6 +27,7 @@ Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
     Route::prefix('teachers')->group(function () {
         Route::get('/', [TeacherController::class, 'index']);
         Route::post('/', [TeacherController::class, 'store']);
+        Route::put('/{teacher}', [TeacherController::class, 'update']);
         Route::delete('/{teacher}', [TeacherController::class, 'destroy']);
     });
 });
@@ -38,7 +39,9 @@ Route::prefix('services')->middleware(['web', 'auth:sanctum'])->group(function (
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail']);
-    Route::post('/email/verify', [EmailVerificationController::class, 'verify']);
+    Route::prefix('email')->group(function () {
+        Route::post('/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail']);
+        Route::post('/verify', [EmailVerificationController::class, 'verify']);
+    });
 });
 

@@ -21,3 +21,25 @@ export const useCreateTeacher = () => {
         },
     });
 };
+
+export const useUpdateTeacher = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (data) =>
+            await axios.put(`/api/admin/teachers/${data.id}`, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["teachers"] });
+        },
+    });
+};
+
+export const useDeleteTeacher = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (id) =>
+            await axios.delete(`/api/admin/teachers/${id}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["teachers"] });
+        },
+    });
+};

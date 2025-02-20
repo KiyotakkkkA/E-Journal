@@ -89,7 +89,10 @@ const UserInfo = observer(() => {
     const handleSubmit = useCallback(() => {
         const updatedRequestData = {
             ...requestData,
-            name: user?.user?.name || requestData.name,
+            name:
+                user?.user?.name !== "Неизвестный"
+                    ? user?.user?.name
+                    : requestData.name,
         };
 
         userProfileStore.setRequestData(updatedRequestData);
