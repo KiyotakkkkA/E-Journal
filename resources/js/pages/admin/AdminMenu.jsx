@@ -10,7 +10,7 @@ const AdminMenu = () => {
         {
             title: "Заявки на прикрепление",
             description: "Управление заявками на прикрепление к группам",
-            icon: "mdi:file-document-edit",
+            icon: "mdi:clipboard-text-clock",
             ref: "/admin/requests",
             color: "#2196F3",
             badge: requestsCount > 0,
@@ -26,14 +26,14 @@ const AdminMenu = () => {
         {
             title: "Преподаватели",
             description: "Управление преподавателями",
-            icon: "mdi:human-male-board",
+            icon: "mdi:account-tie",
             ref: "/admin/teachers",
             color: "#FF9800",
         },
         {
             title: "Дисциплины",
             description: "Управление дисциплинами",
-            icon: "mdi:book-open-variant",
+            icon: "mdi:book-education",
             ref: "/admin/disciplines",
             color: "#86B32D",
         },
@@ -54,7 +54,18 @@ const AdminMenu = () => {
 
     return (
         <MenuLayout>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex items-center justify-between mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Панель администратора
+                    </h1>
+                    <div className="flex items-center gap-3">
+                        <span className="text-sm text-gray-500">
+                            Добро пожаловать в панель управления
+                        </span>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {services.map((service, index) => (
                         <ServiceCard key={index} service={service} />

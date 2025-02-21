@@ -7,65 +7,83 @@ import axios from "../../../axios";
 
 const RequestCard = ({ request, onApprove, onReject }) => {
     return (
-        <div className="bg-amber-50 rounded-xl border border-amber-100 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 hover:border-purple-200 hover:shadow-md transition-all duration-300 overflow-hidden">
             <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                    <h5 className="text-lg font-medium text-gray-900">
-                        Заявка №{request.id}
-                    </h5>
-                    <span
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full
-                                   text-xs font-medium bg-amber-100 text-amber-700"
-                    >
-                        <Icon icon="mdi:clock-outline" className="mr-1" />В
+                <div className="flex justify-between items-start mb-6">
+                    <div>
+                        <h5 className="text-lg font-semibold text-gray-900 mb-1">
+                            Заявка №{request.id}
+                        </h5>
+                        <div className="text-sm text-gray-500">
+                            {new Date(request.created_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                        <Icon icon="mdi:clock-outline" className="mr-1.5" />В
                         обработке
                     </span>
                 </div>
 
-                <div className="space-y-4">
-                    <div>
-                        <div className="text-sm text-gray-500 mb-1">
-                            Студент
+                <div className="space-y-4 bg-gray-50 rounded-lg p-4 mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                            <Icon
+                                icon="mdi:account"
+                                className="text-xl text-purple-600"
+                            />
                         </div>
-                        <div className="font-medium text-gray-900">
-                            {request.name}
+                        <div>
+                            <div className="text-xs text-gray-500 mb-0.5">
+                                Студент
+                            </div>
+                            <div className="font-medium text-gray-900">
+                                {request.name}
+                            </div>
                         </div>
                     </div>
 
-                    <div>
-                        <div className="text-sm text-gray-500 mb-1">Группа</div>
-                        <div className="font-medium text-gray-900">
-                            {request.group.name}
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                            <Icon
+                                icon="mdi:account-group"
+                                className="text-xl text-blue-600"
+                            />
                         </div>
-                    </div>
-
-                    <div>
-                        <div className="text-sm text-gray-500 mb-1">
-                            Дата заявки
-                        </div>
-                        <div className="font-medium text-gray-900">
-                            {new Date(request.created_at).toLocaleDateString()}
+                        <div>
+                            <div className="text-xs text-gray-500 mb-0.5">
+                                Группа
+                            </div>
+                            <div className="font-medium text-gray-900">
+                                {request.group.name}
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex gap-2 mt-6">
+                <div className="flex gap-3">
                     <button
                         onClick={() => onApprove(request.id)}
-                        className="flex-1 inline-flex items-center justify-center px-4 py-2
-                                 bg-green-600 text-white rounded-lg hover:bg-green-700
-                                 transition-colors duration-200"
+                        className="flex-1 inline-flex items-center justify-center px-4 py-2.5
+                        bg-green-600 text-white rounded-lg hover:bg-green-700
+                        transition-all duration-200 shadow-sm hover:shadow group"
                     >
-                        <Icon icon="mdi:check" className="mr-2" />
+                        <Icon
+                            icon="mdi:check"
+                            className="mr-2 text-xl group-hover:scale-110 transition-transform"
+                        />
                         Одобрить
                     </button>
                     <button
                         onClick={() => onReject(request.id)}
-                        className="flex-1 inline-flex items-center justify-center px-4 py-2
-                                 bg-red-600 text-white rounded-lg hover:bg-red-700
-                                 transition-colors duration-200"
+                        className="flex-1 inline-flex items-center justify-center px-4 py-2.5
+                        border border-red-200 text-red-600 rounded-lg
+                        hover:bg-red-50 hover:border-red-300 hover:text-red-700
+                        transition-all duration-200 group"
                     >
-                        <Icon icon="mdi:close" className="mr-2" />
+                        <Icon
+                            icon="mdi:close"
+                            className="mr-2 text-xl group-hover:scale-110 transition-transform"
+                        />
                         Отклонить
                     </button>
                 </div>
@@ -121,47 +139,44 @@ const Requests = () => {
 
     return (
         <MenuLayout>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex justify-between items-center mb-8">
+            <div className="container mx-auto px-4 py-8">
+                <div className="flex justify-between items-start mb-8">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3 mb-2">
                             Заявки на прикрепление
                             {requests.length > 0 && (
-                                <span
-                                    className="ml-2 inline-flex items-center px-2.5 py-0.5
-                                               rounded-full text-xs font-medium
-                                               bg-red-100 text-red-600"
-                                >
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-700 border border-red-200">
                                     {requests.length}
                                 </span>
                             )}
-                        </h2>
-                        <p className="mt-1 text-sm text-gray-500">
+                        </h1>
+                        <p className="text-gray-600">
                             Управление заявками на прикрепление к группам
                         </p>
                     </div>
                     <Link
                         to="/admin"
-                        className="text-gray-500 hover:text-gray-600
-                                 transition-all duration-200 transform
-                                 hover:-translate-y-0.5 active:translate-y-0"
+                        className="p-2 text-gray-500 hover:text-gray-600 bg-gray-100
+                        hover:bg-gray-200 rounded-lg transition-all duration-200"
                     >
-                        <div
-                            className="w-12 h-12 rounded-lg flex items-center justify-center
-                                      bg-gray-100 hover:bg-gray-200 transition-all duration-200"
-                        >
-                            <Icon icon="mdi:arrow-left" className="text-xl" />
-                        </div>
+                        <Icon icon="mdi:arrow-left" className="text-xl" />
                     </Link>
                 </div>
 
                 {requests.length === 0 ? (
-                    <div
-                        className="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg
-                                  flex items-center"
-                    >
-                        <Icon icon="mdi:information" className="mr-2 text-xl" />
-                        Нет активных заявок на рассмотрение
+                    <div className="max-w-md mx-auto text-center py-12">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
+                            <Icon
+                                icon="mdi:information"
+                                className="text-3xl text-blue-600"
+                            />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                            Нет активных заявок
+                        </h3>
+                        <p className="text-gray-500">
+                            На данный момент нет заявок, требующих рассмотрения
+                        </p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

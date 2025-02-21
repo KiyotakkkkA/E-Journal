@@ -24,6 +24,16 @@ export default function GroupDropdown({ group, disabled, onOperationStart }) {
 
     const isLoading = isUpdating || isDeleting;
 
+    const handleEditClick = () => {
+        onOperationStart("editing");
+        setShowEditModal(true);
+    };
+
+    const handleDeleteClick = () => {
+        onOperationStart("deleting");
+        setShowDeleteModal(true);
+    };
+
     useEffect(() => {
         if (isUpdating) {
             onOperationStart("editing");
@@ -92,7 +102,7 @@ export default function GroupDropdown({ group, disabled, onOperationStart }) {
                                             }
                                             flex items-center
                                         `}
-                                        onClick={() => setShowEditModal(true)}
+                                        onClick={handleEditClick}
                                         disabled={isLoading}
                                     >
                                         <Icon
@@ -106,7 +116,7 @@ export default function GroupDropdown({ group, disabled, onOperationStart }) {
                             <MenuItem>
                                 {({ active }) => (
                                     <button
-                                        onClick={() => setShowDeleteModal(true)}
+                                        onClick={handleDeleteClick}
                                         className={`
                                             ${
                                                 active
@@ -139,14 +149,20 @@ export default function GroupDropdown({ group, disabled, onOperationStart }) {
             <DeleteGroupModal
                 group={group}
                 isOpen={showDeleteModal}
-                onClose={() => setShowDeleteModal(false)}
+                onClose={() => {
+                    setShowDeleteModal(false);
+                    onOperationStart(null);
+                }}
                 onConfirm={deleteGroup}
             />
 
             <EditGroupModal
                 group={group}
                 isOpen={showEditModal}
-                onClose={() => setShowEditModal(false)}
+                onClose={() => {
+                    setShowEditModal(false);
+                    onOperationStart(null);
+                }}
                 onSave={updateGroup}
             />
         </>

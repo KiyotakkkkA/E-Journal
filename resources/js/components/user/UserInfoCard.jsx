@@ -1,13 +1,29 @@
 import { Icon } from "@iconify/react";
 
-const UserInfoCard = ({ title, icon, value }) => {
+const UserInfoCard = ({ title, icon, value, color = "purple" }) => {
+    const colors = {
+        purple: "bg-purple-50 text-purple-600",
+        blue: "bg-blue-50 text-blue-600",
+        green: "bg-green-50 text-green-600",
+    };
+
     return (
-        <div className="bg-gray-100 rounded-lg p-4 transition-all duration-200 hover:bg-gray-200">
-            <div className="flex items-center gap-3 mb-2">
-                <Icon icon={icon} className="text-purple-600 text-xl" />
-                <h3 className="text-sm font-medium text-gray-600">{title}</h3>
+        <div className="bg-white rounded-lg border border-gray-100 p-4 hover:border-gray-200 transition-all duration-200">
+            <div className="flex items-start gap-3">
+                <div
+                    className={`p-2 rounded-lg ${colors[color]} bg-opacity-20`}
+                >
+                    <Icon icon={icon} className="text-xl" />
+                </div>
+                <div>
+                    <h3 className="text-sm font-medium text-gray-500 mb-1">
+                        {title}
+                    </h3>
+                    <p className="text-base font-semibold text-gray-900">
+                        {value}
+                    </p>
+                </div>
             </div>
-            <p className="text-gray-800 font-medium pl-8">{value}</p>
         </div>
     );
 };
