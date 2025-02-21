@@ -40,3 +40,14 @@ export const useSendMessage = (msgFillerFunc, filler) => {
         },
     });
 };
+
+export const useTotalData = () => {
+    return useQuery({
+        queryKey: ["total-data"],
+        queryFn: async () => {
+            const response = await axios.get("/api/statistics/total");
+            console.log(response.data);
+            return response.data;
+        },
+    });
+};

@@ -12,18 +12,22 @@ use App\Http\Controllers\Api\CafedrasController;
 use App\Http\Controllers\Api\DisciplineController;
 use App\Http\Controllers\Api\UserStatusController;
 use App\Http\Controllers\Api\MessageController;
-
+use App\Http\Controllers\Api\StatisticsController;
 
 Route::middleware("web")->group(function () {
     Route::get("/check-auth", [AuthController::class, "checkAuth"]);
 });
 
 Route::middleware(['web', 'auth:sanctum'])->group(function () {
-    Route::get("/user", [UserController::class, "index"]);
-    Route::get("/user/student", [StudentRequestController::class, "index"]);
+    Route::prefix('user')->group(function () {
+        Route::get("/", [UserController::class, "index"]);
+        Route::get("/student", [StudentRequestController::class, "index"]);
+    });
 
     Route::get('/online-users', [UserStatusController::class, 'getOnlineUsers']);
     Route::post('/user-status', [UserStatusController::class, 'updateUserStatus']);
+
+    Route::get('/statistics/total', [StatisticsController::class, 'getTotalData']);
 });
 
 Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {

@@ -1,9 +1,12 @@
-import React from "react";
-import { Icon } from "@iconify/react";
+import React, { useEffect } from "react";
 import MenuLayout from "../layouts/MenuLayout";
 import OnlineUsers from "../layouts/OnlineUsers";
 import ChatWindow from "../components/Chat/ChatWindow";
-
+import { mainPageStore } from "../stores/mainPageStore";
+import { observer } from "mobx-react-lite";
+import { Icon } from "@iconify/react";
+import { useTotalData } from "../scripts/hooks/useRealTimeQueries";
+import { useSyncData } from "../scripts/hooks/common";
 const StatCard = ({ icon, title, value, trend, color }) => (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <div className="flex items-start justify-between">
@@ -44,26 +47,33 @@ const ActivityItem = ({ icon, title, description, time, color }) => (
     </div>
 );
 
-export default function Main() {
+const Main = observer(() => {
+    const { data, isLoading } = useTotalData();
+    const totalStats = mainPageStore.getTotalData();
+    const syncData = useSyncData();
+    useEffect(() => {
+        if (data) {
+            syncData(data, "totalData", isLoading, mainPageStore);
+        }
+    }, [data]);
+
     const stats = [
         {
             icon: "mdi:account-group",
             title: "Активных студентов",
-            value: "2,847",
-            trend: 12,
+            value: totalStats.students,
             color: { bg: "bg-blue-500", text: "text-blue-500" },
         },
         {
             icon: "mdi:school",
             title: "Преподавателей",
-            value: "184",
-            trend: 4,
+            value: totalStats.teachers,
             color: { bg: "bg-purple-500", text: "text-purple-500" },
         },
         {
             icon: "mdi:book-education",
             title: "Учебных групп",
-            value: "156",
+            value: totalStats.groups,
             color: { bg: "bg-orange-500", text: "text-orange-500" },
         },
         {
@@ -148,4 +158,6 @@ export default function Main() {
             </div>
         </MenuLayout>
     );
-}
+});
+
+export default Main;

@@ -15,6 +15,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useGroupHistory } from "../scripts/hooks/useGroupsQueries";
 import { userProfileStore } from "../stores/userProfileStore";
 import { observer } from "mobx-react-lite";
+import { useSyncData } from "../scripts/hooks/common";
 import VerifyEmailButton from "./elements/VerifyEmailButton";
 
 const UserInfo = observer(() => {
@@ -58,32 +59,28 @@ const UserInfo = observer(() => {
         isSuccess: isRequestSuccess,
     } = useSendRequest();
 
-    const syncData = useCallback((data, type, isLoading) => {
-        if (data && !isLoading && data !== userProfileStore[type]) {
-            userProfileStore.syncData(data, type);
-        }
-    }, []);
+    const syncData = useSyncData();
 
     useEffect(() => {
         if (auth.roles) {
-            syncData(auth.roles, "roles", false);
+            syncData(auth.roles, "roles", false, userProfileStore);
         }
     }, [auth.roles, syncData]);
 
     useEffect(() => {
-        syncData(userData, "user", isUserLoading);
+        syncData(userData, "user", isUserLoading, userProfileStore);
     }, [userData, isUserLoading, syncData]);
 
     useEffect(() => {
-        syncData(groupsData, "groups", isGroupsLoading);
+        syncData(groupsData, "groups", isGroupsLoading, userProfileStore);
     }, [groupsData, isGroupsLoading, syncData]);
 
     useEffect(() => {
-        syncData(requestsData, "requests", isRequestsLoading);
+        syncData(requestsData, "requests", isRequestsLoading, userProfileStore);
     }, [requestsData, isRequestsLoading, syncData]);
 
     useEffect(() => {
-        syncData(historyData, "history", isHistoryLoading);
+        syncData(historyData, "history", isHistoryLoading, userProfileStore);
     }, [historyData, isHistoryLoading, syncData]);
 
     const handleSubmit = useCallback(() => {

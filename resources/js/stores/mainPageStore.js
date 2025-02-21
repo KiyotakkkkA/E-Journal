@@ -1,15 +1,28 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, action, runInAction } from "mobx";
 
 class MainPageStore {
     totalData = {
-        users: 0,
+        students: 0,
         groups: 0,
         teachers: 0,
     };
 
     constructor() {
-        makeAutoObservable(this);
+        makeAutoObservable(this, {
+            syncData: action,
+            setTotalData: action,
+        });
     }
+
+    syncData = (data, type) => {
+        if (!data || JSON.stringify(this[type]) === JSON.stringify(data)) {
+            return;
+        }
+
+        runInAction(() => {
+            this[type] = data;
+        });
+    };
 
     getTotalData() {
         return this.totalData;
