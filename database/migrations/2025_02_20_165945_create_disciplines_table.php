@@ -11,33 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-
         Schema::create('disciplines', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
             $table->string('name');
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
-
-        Schema::create('lessons', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('discipline_id')->constrained('disciplines');
-            $table->string('name');
-            $table->enum('type', ['lecture', 'practice', 'lab', 'exam', 'other']);
-            $table->timestamps();
-        });
-
-        Schema::create('institutes', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
-
-        Schema::create('cafedras', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->foreignId('institute_id')->constrained('institutes');
+            $table->json('types');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -51,6 +29,14 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
+
+        Schema::create('lessons', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('discipline_id')->constrained('disciplines');
+            $table->foreignId('teacher_id')->constrained('teachers');
+            $table->enum('type', ['lecture', 'practice', 'lab', 'seminar']);
+            $table->timestamps();
+        });
     }
 
     /**
@@ -59,9 +45,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('lessons');
-        Schema::dropIfExists('disciplines');
         Schema::dropIfExists('teachers');
-        Schema::dropIfExists('cafedras');
-        Schema::dropIfExists('institutes');
+        Schema::dropIfExists('disciplines');
     }
 };

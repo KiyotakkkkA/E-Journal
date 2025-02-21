@@ -4,16 +4,20 @@ import { Link } from "react-router-dom";
 import AnimatedLoader from "../../../components/elements/AnimatedLoader";
 import MenuLayout from "../../../layouts/MenuLayout";
 import { useTeachers } from "../../../scripts/hooks/useTeachersQueries";
+import { useBindDisciplineToTeacher } from "../../../scripts/hooks/useDisciplinesQueries";
 import AddTeacherModal from "../../../components/admin/modals/AddTeacherModal";
 import EditTeacherModal from "../../../components/admin/modals/EditTeacherModal";
 import DeleteTeacherModal from "../../../components/admin/modals/DeleteTeacherModal";
+import TeacherDisciplinesModal from "@/components/admin/modals/TeacherDisciplinesModal";
 
 export default function Teachers() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isEditFormOpen, setIsEditFormOpen] = useState(false);
     const [isDeleteFormOpen, setIsDeleteFormOpen] = useState(false);
     const [teacher, setTeacher] = useState(null);
+    const [disciplinesTeacher, setDisciplinesTeacher] = useState(null);
 
+    const { mutate: bindDisciplineToTeacher } = useBindDisciplineToTeacher();
     const { data: teachers, isLoading } = useTeachers(false);
 
     const handleEdit = (teacher) => {
@@ -24,6 +28,31 @@ export default function Teachers() {
     const handleDelete = (teacher) => {
         setTeacher(teacher);
         setIsDeleteFormOpen(true);
+    };
+
+    const handleAddDisciplines = (teacher) => {
+        setDisciplinesTeacher(teacher);
+    };
+
+    const handleShowDisciplines = (teacher) => {
+        setTeacher(teacher);
+        setDisciplinesTeacher(teacher);
+    };
+
+    const handleSaveDisciplines = async (disciplines) => {
+        try {
+            const data = {
+                teacher_id: disciplinesTeacher.id,
+                disciplines: disciplines.map((d) => ({
+                    id: d.id,
+                    types: d.types,
+                })),
+            };
+            bindDisciplineToTeacher(data);
+            setDisciplinesTeacher(null);
+        } catch (error) {
+            console.error("Ошибка при сохранении дисциплин:", error);
+        }
     };
 
     if (isLoading) {
@@ -105,8 +134,22 @@ export default function Teachers() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm text-gray-900">
-                                                {teacher.disciplines ? (
-                                                    <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all">
+                                                {teacher.disciplines?.length >
+                                                0 ? (
+                                                    <button
+                                                        onClick={() =>
+                                                            handleShowDisciplines(
+                                                                teacher
+                                                            )
+                                                        }
+                                                        className={`inline-flex items-center gap-2
+                                                        px-4 py-2 text-sm font-medium text-purple-700 bg-purple-100 rounded-lg
+                                                        hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all ${
+                                                            !teacher.email_verified_at
+                                                                ? "hidden"
+                                                                : ""
+                                                        }`}
+                                                    >
                                                         <Icon
                                                             icon="mdi:book-open-variant"
                                                             className="text-xl"
@@ -114,12 +157,26 @@ export default function Teachers() {
                                                         Показать дисциплины
                                                     </button>
                                                 ) : (
-                                                    <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all">
+                                                    <button
+                                                        onClick={() => {
+                                                            setTeacher(teacher);
+                                                            handleAddDisciplines(
+                                                                teacher
+                                                            );
+                                                        }}
+                                                        className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 hover:text-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-100 transition-all ${
+                                                            !teacher.email_verified_at
+                                                                ? "hidden"
+                                                                : ""
+                                                        }`}
+                                                    >
                                                         <Icon
-                                                            icon="mdi:plus"
+                                                            icon="mdi:book-plus"
                                                             className="text-xl"
                                                         />
-                                                        Добавить дисциплины
+                                                        <span>
+                                                            Добавить дисциплины
+                                                        </span>
                                                     </button>
                                                 )}
                                             </div>
@@ -183,6 +240,14 @@ export default function Teachers() {
                 {isFormOpen && (
                     <AddTeacherModal onClose={() => setIsFormOpen(false)} />
                 )}
+
+                <TeacherDisciplinesModal
+                    isOpen={!!disciplinesTeacher}
+                    onClose={() => setDisciplinesTeacher(null)}
+                    onSubmit={handleSaveDisciplines}
+                    teacher={disciplinesTeacher}
+                    initialDisciplines={disciplinesTeacher?.disciplines || []}
+                />
             </div>
         </MenuLayout>
     );

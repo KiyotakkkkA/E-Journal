@@ -9,20 +9,44 @@ use Illuminate\Support\Facades\Hash;
 
 class TeacherController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
+        $query = User::select([
+            'roles.name as role_name',
+            'users.id',
+            'users.email',
+            'users.email_verified_at',
+            'users.name',
+            'teachers.id as teacher_id'
+        ])
+        ->join('roles', 'users.role_id', '=', 'roles.id')
+        ->leftJoin('teachers', 'users.id', '=', 'teachers.user_id')
+        ->where('roles.name', 'Преподаватель')
+        ->with(['teacher.lessons' => function($query) {
+            $query->select('id', 'teacher_id', 'discipline_id', 'type')
+                ->with('discipline:id,name,code');
+        }]);
 
-        $state = $request->query('verified');
-
-        $query = User::select(['roles.name', 'users.id', 'users.email', 'users.email_verified_at', 'users.name'])
-            ->join('roles', 'users.role_id', '=', 'roles.id')
-            ->where('roles.name', 'Преподаватель');
-
-        if ($state === 'true') {
-            $query->where('users.email_verified_at', '!=', null);
-        }
-
-        return $query->get();
+        return $query->get()->map(function($user) {
+            return [
+                'id' => $user->id,
+                'email' => $user->email,
+                'name' => $user->name,
+                'email_verified_at' => $user->email_verified_at,
+                'disciplines' => $user->teacher ? $user->teacher->lessons
+                    ->groupBy('discipline_id')
+                    ->map(function($lessons) {
+                        $discipline = $lessons->first()->discipline;
+                        return [
+                            'id' => $discipline->id,
+                            'name' => $discipline->name,
+                            'code' => $discipline->code,
+                            'types' => $lessons->pluck('type')->toArray()
+                        ];
+                    })->values()
+                    : []
+            ];
+        });
     }
 
     public function store(Request $request)

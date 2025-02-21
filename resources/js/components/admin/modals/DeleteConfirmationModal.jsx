@@ -4,10 +4,13 @@ import { Icon } from "@iconify/react";
 export default function DeleteConfirmationModal({
     title,
     message,
+    isOpen = false,
+    onClose,
     onConfirm,
-    onCancel,
     isLoading,
 }) {
+    if (!isOpen) return null;
+
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-8 w-full max-w-md shadow-xl">
@@ -16,7 +19,7 @@ export default function DeleteConfirmationModal({
                         {title}
                     </h2>
                     <button
-                        onClick={onCancel}
+                        onClick={onClose}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
                     >
                         <Icon icon="mdi:close" className="text-2xl" />
@@ -28,7 +31,7 @@ export default function DeleteConfirmationModal({
                 <div className="flex justify-end gap-3">
                     <button
                         type="button"
-                        onClick={onCancel}
+                        onClick={onClose}
                         className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all"
                     >
                         Отмена
@@ -37,9 +40,19 @@ export default function DeleteConfirmationModal({
                         type="button"
                         onClick={onConfirm}
                         disabled={isLoading}
-                        className="px-6 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all"
+                        className="px-6 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
-                        {isLoading ? "Удаление..." : "Удалить"}
+                        {isLoading ? (
+                            <div className="flex items-center gap-2">
+                                <Icon
+                                    icon="mdi:loading"
+                                    className="animate-spin"
+                                />
+                                Удаление...
+                            </div>
+                        ) : (
+                            "Удалить"
+                        )}
                     </button>
                 </div>
             </div>

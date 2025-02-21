@@ -15,6 +15,9 @@ type Query {
     cafedras(institute_id: ID): [Cafedra!]!
         @field(resolver: "App\\GraphQL\\Queries\\CafedrasQuery@resolve")
     disciplines: [Discipline!]! @all
+    teachers_with_lessons: [Teacher!]!
+        @field(resolver: "App\\GraphQL\\Queries\\TeachersQuery@resolve")
+        @all
 }
 
 type Group {
@@ -54,4 +57,24 @@ type Cafedra {
     id: ID!
     name: String!
     count_teachers: Int!
+}
+
+type Teacher {
+    id: ID!
+    name: String!
+    email: String!
+    disciplines: [TeacherDiscipline!]!
+}
+
+type TeacherDiscipline {
+    id: ID!
+    name: String!
+    lessons: [Lesson!]!
+}
+
+type Lesson {
+    id: ID!
+    discipline_id: ID!
+    teacher_id: ID!
+    type: String!
 }

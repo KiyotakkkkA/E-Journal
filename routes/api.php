@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\StudentRequestController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\InstitutesController;
 use App\Http\Controllers\Api\CafedrasController;
+use App\Http\Controllers\Api\DisciplineController;
 
 
 Route::middleware("web")->group(function () {
@@ -36,6 +37,15 @@ Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
         Route::get('/{cafedra}/teachers', [CafedrasController::class, 'getCafedraTeachers']);
         Route::post('/{cafedra}/teachers', [CafedrasController::class, 'assignTeachers']);
         Route::delete('/{cafedra}/teachers', [CafedrasController::class, 'removeTeacher']);
+    });
+
+    Route::prefix('disciplines')->group(function () {
+        Route::get('/', [DisciplineController::class, 'index']);
+        Route::post('/', [DisciplineController::class, 'store']);
+        Route::put('/{discipline}', [DisciplineController::class, 'update']);
+        Route::delete('/{discipline}', [DisciplineController::class, 'destroy']);
+
+        Route::post('/bind', [DisciplineController::class, 'bindDisciplineToTeacher']);
     });
 
     Route::prefix('requests')->group(function () {
