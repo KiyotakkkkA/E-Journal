@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\InstitutesController;
 use App\Http\Controllers\Api\CafedrasController;
 use App\Http\Controllers\Api\DisciplineController;
+use App\Http\Controllers\Api\UserStatusController;
+use App\Http\Controllers\Api\MessageController;
 
 
 Route::middleware("web")->group(function () {
@@ -19,6 +21,9 @@ Route::middleware("web")->group(function () {
 Route::middleware(['web', 'auth:sanctum'])->group(function () {
     Route::get("/user", [UserController::class, "index"]);
     Route::get("/user/student", [StudentRequestController::class, "index"]);
+
+    Route::get('/online-users', [UserStatusController::class, 'getOnlineUsers']);
+    Route::post('/user-status', [UserStatusController::class, 'updateUserStatus']);
 });
 
 Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
@@ -67,10 +72,15 @@ Route::prefix('services')->middleware(['web', 'auth:sanctum'])->group(function (
     });
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['web', 'auth:sanctum'])->group(function () {
     Route::prefix('email')->group(function () {
         Route::post('/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail']);
         Route::post('/verify', [EmailVerificationController::class, 'verify']);
+    });
+
+    Route::prefix('messages')->group(function () {
+        Route::get('/', [MessageController::class, 'getMessages']);
+        Route::post('/send', [MessageController::class, 'sendMessage']);
     });
 });
 

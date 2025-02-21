@@ -1,6 +1,8 @@
 import React from "react";
 import { Icon } from "@iconify/react";
 import MenuLayout from "../layouts/MenuLayout";
+import OnlineUsers from "../layouts/OnlineUsers";
+import ChatWindow from "../components/Chat/ChatWindow";
 
 const StatCard = ({ icon, title, value, trend, color }) => (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
@@ -123,24 +125,23 @@ export default function Main() {
                     ))}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                            Активность студентов
-                        </h2>
-                        <div className="h-64 flex items-center justify-center text-gray-500">
-                            Здесь может быть график активности
-                        </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div className="lg:col-span-8">
+                        <ChatWindow />
                     </div>
 
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                            Последние действия
-                        </h2>
-                        <div className="space-y-1">
-                            {recentActivity.map((activity, index) => (
-                                <ActivityItem key={index} {...activity} />
-                            ))}
+                    <div className="lg:col-span-4 space-y-6">
+                        <OnlineUsers />
+
+                        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                                Последние действия
+                            </h2>
+                            <div className="space-y-3">
+                                {recentActivity.map((activity, index) => (
+                                    <ActivityItem key={index} {...activity} />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

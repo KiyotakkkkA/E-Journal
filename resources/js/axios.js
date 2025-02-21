@@ -40,6 +40,11 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
     async (response) => {
         await updateCsrfToken();
+        if (response.config.url !== "/api/user-status") {
+            try {
+                await axios.post("/api/user-status");
+            } catch (error) {}
+        }
         return response;
     },
     async (error) => {

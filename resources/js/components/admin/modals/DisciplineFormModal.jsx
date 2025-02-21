@@ -81,7 +81,6 @@ export default function DisciplineFormModal({
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Код дисциплины */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Код дисциплины
