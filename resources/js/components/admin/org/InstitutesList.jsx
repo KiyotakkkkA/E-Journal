@@ -120,8 +120,7 @@ export default function InstitutesList({
                                             e.stopPropagation();
                                             onDelete(institute);
                                         }}
-                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-white rounded-md transition-colors"
-                                        title="Удалить"
+                                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                                     >
                                         <Icon
                                             icon="mdi:delete"

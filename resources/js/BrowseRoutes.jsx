@@ -9,6 +9,7 @@ import ServicesMenu from "./pages/common/ServicesMenu";
 import Requests from "./pages/admin/services/Requests";
 import OrgStructure from "./pages/admin/services/OrgStructure";
 import Disciplines from "./pages/admin/services/Disciplines";
+import FileManager from "./pages/admin/services/FileManager";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import AdminMenu from "./pages/admin/AdminMenu";
@@ -62,6 +63,14 @@ export default function BrowseRoutes() {
                     element={
                         <AdminRoute>
                             <OrgStructure />
+                        </AdminRoute>
+                    }
+                />
+                <Route
+                    path="/admin/data"
+                    element={
+                        <AdminRoute>
+                            <FileManager />
                         </AdminRoute>
                     }
                 />

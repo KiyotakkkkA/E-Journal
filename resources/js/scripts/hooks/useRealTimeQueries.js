@@ -46,7 +46,6 @@ export const useTotalData = () => {
         queryKey: ["total-data"],
         queryFn: async () => {
             const response = await axios.get("/api/statistics/total");
-            console.log(response.data);
             return response.data;
         },
     });

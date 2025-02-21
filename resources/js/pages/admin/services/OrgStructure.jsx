@@ -206,9 +206,14 @@ export default function OrgStructure() {
                         </button>
                         <Link
                             to="/admin"
-                            className="text-gray-500 hover:text-gray-600 transition-all duration-200"
+                            className="text-gray-500 hover:text-gray-600
+                                 transition-all duration-200 transform
+                                 hover:-translate-y-0.5 active:translate-y-0"
                         >
-                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-gray-100 hover:bg-gray-200">
+                            <div
+                                className="w-12 h-12 rounded-lg flex items-center justify-center
+                                      bg-gray-100 hover:bg-gray-200 transition-all duration-200"
+                            >
                                 <Icon
                                     icon="mdi:arrow-left"
                                     className="text-xl"
@@ -315,10 +320,10 @@ export default function OrgStructure() {
                     />
                 )}
 
-                {isDeleteModalOpen && (
+                {isDeleteModalOpen && instituteToDelete && (
                     <DeleteConfirmationModal
                         title="Удаление института"
-                        message={`Вы действительно хотите удалить институт "${instituteToDelete?.name}"?`}
+                        message={`Вы действительно хотите удалить институт "${instituteToDelete.name}"?`}
                         onConfirm={() =>
                             handleDeleteInstitute(instituteToDelete)
                         }

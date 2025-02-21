@@ -44,6 +44,14 @@ const AdminMenu = () => {
             ref: "/admin/structure",
             color: "#CD0074",
         },
+        {
+            title: "Загрузить / выгрузить данные",
+            description:
+                "Выгрузить данные системы в файл или загрузить данные из файла",
+            icon: "mdi:file-arrow-up-down",
+            ref: "/admin/data",
+            color: "#200772",
+        },
     ];
 
     useEffect(() => {

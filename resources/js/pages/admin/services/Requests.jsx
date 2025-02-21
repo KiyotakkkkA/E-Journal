@@ -156,10 +156,16 @@ const Requests = () => {
                     </div>
                     <Link
                         to="/admin"
-                        className="p-2 text-gray-500 hover:text-gray-600 bg-gray-100
-                        hover:bg-gray-200 rounded-lg transition-all duration-200"
+                        className="text-gray-500 hover:text-gray-600
+                                 transition-all duration-200 transform
+                                 hover:-translate-y-0.5 active:translate-y-0"
                     >
-                        <Icon icon="mdi:arrow-left" className="text-xl" />
+                        <div
+                            className="w-12 h-12 rounded-lg flex items-center justify-center
+                                      bg-gray-100 hover:bg-gray-200 transition-all duration-200"
+                        >
+                            <Icon icon="mdi:arrow-left" className="text-xl" />
+                        </div>
                     </Link>
                 </div>
 

@@ -22,7 +22,8 @@ const disciplineTypesNames = {
 export default function Disciplines() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingDiscipline, setEditingDiscipline] = useState(null);
-    const [deletingDiscipline, setDeletingDiscipline] = useState(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [disciplineToDelete, setDisciplineToDelete] = useState(null);
 
     const { data: disciplines, isLoading } = useDisciplines();
     const { mutate: createDiscipline, isPending: isCreating } =
@@ -43,8 +44,14 @@ export default function Disciplines() {
     };
 
     const handleDelete = () => {
-        deleteDiscipline(deletingDiscipline.id);
-        setDeletingDiscipline(null);
+        deleteDiscipline(disciplineToDelete.id);
+        setIsDeleteModalOpen(false);
+        setDisciplineToDelete(null);
+    };
+
+    const handleDeleteClick = (discipline) => {
+        setDisciplineToDelete(discipline);
+        setIsDeleteModalOpen(true);
     };
 
     return (
@@ -64,9 +71,14 @@ export default function Disciplines() {
                         </button>
                         <Link
                             to="/admin"
-                            className="text-gray-500 hover:text-gray-600 transition-all duration-200"
+                            className="text-gray-500 hover:text-gray-600
+                                 transition-all duration-200 transform
+                                 hover:-translate-y-0.5 active:translate-y-0"
                         >
-                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-gray-100 hover:bg-gray-200">
+                            <div
+                                className="w-12 h-12 rounded-lg flex items-center justify-center
+                                      bg-gray-100 hover:bg-gray-200 transition-all duration-200"
+                            >
                                 <Icon
                                     icon="mdi:arrow-left"
                                     className="text-xl"
@@ -167,7 +179,7 @@ export default function Disciplines() {
                                                         className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded-lg transition-colors"
                                                         title="Удалить"
                                                         onClick={() =>
-                                                            setDeletingDiscipline(
+                                                            handleDeleteClick(
                                                                 discipline
                                                             )
                                                         }
@@ -202,18 +214,19 @@ export default function Disciplines() {
                     isLoading={isUpdating}
                 />
 
-                <DeleteConfirmationModal
-                    title="Удаление дисциплины"
-                    message={
-                        deletingDiscipline
-                            ? `Вы действительно хотите удалить дисциплину "${deletingDiscipline.name}"? Это действие нельзя отменить.`
-                            : ""
-                    }
-                    isOpen={!!deletingDiscipline}
-                    onClose={() => setDeletingDiscipline(null)}
-                    onConfirm={handleDelete}
-                    isLoading={isDeleting}
-                />
+                {isDeleteModalOpen && disciplineToDelete && (
+                    <DeleteConfirmationModal
+                        title="Удаление дисциплины"
+                        message={`Вы действительно хотите удалить дисциплину "${disciplineToDelete.name}"? Это действие нельзя отменить.`}
+                        isOpen={isDeleteModalOpen}
+                        onClose={() => {
+                            setIsDeleteModalOpen(false);
+                            setDisciplineToDelete(null);
+                        }}
+                        onConfirm={handleDelete}
+                        isLoading={isDeleting}
+                    />
+                )}
             </div>
         </MenuLayout>
     );

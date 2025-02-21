@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\DisciplineController;
 use App\Http\Controllers\Api\UserStatusController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\StatisticsController;
+use App\Http\Controllers\Api\FileManagerController;
 
 Route::middleware("web")->group(function () {
     Route::get("/check-auth", [AuthController::class, "checkAuth"]);
@@ -68,6 +69,10 @@ Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
         Route::put('/{teacher}', [TeacherController::class, 'update']);
         Route::delete('/{teacher}', [TeacherController::class, 'destroy']);
     });
+
+    Route::post('/upload-data', [FileManagerController::class, 'uploadData']);
+    Route::get('/download-data/{type}', [FileManagerController::class, 'downloadData']);
+    Route::get('/download-template/{type}', [FileManagerController::class, 'downloadTemplate']);
 });
 
 Route::prefix('services')->middleware(['web', 'auth:sanctum'])->group(function () {

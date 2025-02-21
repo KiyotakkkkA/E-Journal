@@ -45,7 +45,6 @@ export default function DisciplineFormModal({
         e.preventDefault();
         setErrors({});
 
-        // Валидация
         const newErrors = {};
         if (!formData.code.trim()) newErrors.code = "Код дисциплины обязателен";
         if (!formData.name.trim())

@@ -12,6 +12,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "nuwave/lighthouse": "^6.49",
+        "phpoffice/phpspreadsheet": "^4.0",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
