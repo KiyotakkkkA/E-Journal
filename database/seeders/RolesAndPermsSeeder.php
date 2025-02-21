@@ -18,7 +18,9 @@ class RolesAndPermsSeeder extends Seeder
         $rolesArray = [
             [
                 'name' => 'Администратор',
-                'permissions' => ['be_admin', 'view_admin_panel', 'make_schedule', 'make_users', 'view_all_schedule', 'view_all_groups', 'view_all_groups_history', 'make_groups']
+                'permissions' => ['be_admin', 'view_admin_panel',
+                    'make_requests', 'make_schedule', 'make_users', 'view_all_schedule',
+                    'view_all_groups', 'view_all_groups_history', 'make_groups', 'make_requests', 'make_structure', 'make_disciplines']
             ],
             [
                 'name' => 'Преподаватель',
@@ -90,6 +92,18 @@ class RolesAndPermsSeeder extends Seeder
             [
                 'name' => 'make_schedule',
                 'description' => 'Может создавать и редактировать расписание'
+            ],
+            [
+                'name' => 'make_requests',
+                'description' => 'Может создавать и редактировать заявки на добавление в группу'
+            ],
+            [
+                'name' => 'make_structure',
+                'description' => 'Может создавать и редактировать структуру организации'
+            ],
+            [
+                'name' => 'make_disciplines',
+                'description' => 'Может создавать и редактировать дисциплины'
             ],
             [
                 'name' => 'make_users',

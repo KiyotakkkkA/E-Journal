@@ -7,11 +7,17 @@ use App\Models\Cafedra;
 use App\Models\Teacher;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
 class CafedrasController extends Controller
 {
 
     public function store(Request $request)
     {
+        if (!Auth::user()->hasPermissionTo('make_structure')) {
+            return response()->json(['message' => 'У вас нет прав на создание кафедры'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'institute_id' => 'required|exists:institutes,id',
@@ -24,18 +30,30 @@ class CafedrasController extends Controller
 
     public function destroy(Cafedra $cafedra)
     {
+        if (!Auth::user()->hasPermissionTo('make_structure')) {
+            return response()->json(['message' => 'У вас нет прав на удаление кафедры'], 403);
+        }
+
         $cafedra->makeDeleted();
         return response()->json(['message' => 'Cafedra deleted successfully']);
     }
 
     public function update(Cafedra $cafedra, Request $request)
     {
+        if (!Auth::user()->hasPermissionTo('make_structure')) {
+            return response()->json(['message' => 'У вас нет прав на обновление кафедры'], 403);
+        }
+
         $cafedra->update($request->all());
         return response()->json(['message' => 'Cafedra updated successfully']);
     }
 
     public function assignTeachers(Cafedra $cafedra, Request $request)
     {
+        if (!Auth::user()->hasPermissionTo('make_structure')) {
+            return response()->json(['message' => 'У вас нет прав на назначение преподавателей'], 403);
+        }
+
         $teachers = $request['teachers'];
 
         foreach ($teachers as $teacher) {

@@ -64,7 +64,7 @@ class StudentRequestController extends Controller
     public function getCount(Request $request)
     {
         $user = Auth::user();
-        if ($user->hasPermissionTo('view_admin_panel')) {
+        if ($user->hasPermissionTo('make_requests')) {
             $reqPending = StudentRequests::where('status', 'pending')->get();
             return response()->json(['requestsCount' => $reqPending->count()]);
         }
@@ -74,7 +74,7 @@ class StudentRequestController extends Controller
     public function adminIndex()
     {
         $user = Auth::user();
-        if ($user->hasPermissionTo('view_admin_panel')) {
+        if ($user->hasPermissionTo('make_requests')) {
             $requests = StudentRequests::with('group')
                 ->where('status', 'pending')
                 ->get();
@@ -86,7 +86,7 @@ class StudentRequestController extends Controller
     public function approve(StudentRequests $request)
     {
         $user = Auth::user();
-        if ($user->hasPermissionTo('view_admin_panel')) {
+        if ($user->hasPermissionTo('make_requests')) {
             if ($request->user->isEmailVerified()) {
                 $request->update(['status' => 'approved']);
                 $request->group->students_count += 1;
@@ -115,7 +115,7 @@ class StudentRequestController extends Controller
     public function reject(StudentRequests $request)
     {
         $user = Auth::user();
-        if ($user->hasPermissionTo('view_admin_panel')) {
+        if ($user->hasPermissionTo('make_requests')) {
             $request->update(['status' => 'rejected']);
             return response()->json(['message' => 'Request rejected']);
         }

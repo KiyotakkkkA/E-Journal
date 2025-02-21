@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class TeacherController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $verified = $request->query('verified');
+
         $query = User::select([
             'roles.name as role_name',
             'users.id',
@@ -26,6 +29,10 @@ class TeacherController extends Controller
             $query->select('id', 'teacher_id', 'discipline_id', 'type')
                 ->with('discipline:id,name,code');
         }]);
+
+        if ($verified === 'true') {
+            $query->where('email_verified_at', '!=', null);
+        }
 
         return $query->get()->map(function($user) {
             return [
@@ -51,6 +58,11 @@ class TeacherController extends Controller
 
     public function store(Request $request)
     {
+
+        if (!Auth::user()->hasPermissionTo('make_users')) {
+            return response()->json(['message' => 'У вас нет прав на создание пользователя'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -70,12 +82,20 @@ class TeacherController extends Controller
 
     public function destroy(User $teacher)
     {
+        if (!Auth::user()->hasPermissionTo('make_users')) {
+            return response()->json(['message' => 'У вас нет прав на удаление пользователя'], 403);
+        }
+
         $teacher->delete();
         return response()->json(['message' => 'Teacher deleted successfully']);
     }
 
     public function update(User $teacher, Request $request)
     {
+        if (!Auth::user()->hasPermissionTo('make_users')) {
+            return response()->json(['message' => 'У вас нет прав на обновление пользователя'], 403);
+        }
+
         $teacher->update($request->all());
         return response()->json(['message' => 'Teacher updated successfully']);
     }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Discipline;
 use Illuminate\Http\Request;
 use App\Models\Teacher;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class DisciplineController extends Controller
 {
@@ -20,6 +20,10 @@ class DisciplineController extends Controller
 
     public function store(Request $request)
     {
+        if (!Auth::user()->hasPermissionTo('make_disciplines')) {
+            return response()->json(['message' => 'У вас нет прав на создание дисциплины'], 403);
+        }
+
         $validated = $request->validate([
             'code' => 'required|string|unique:disciplines,code',
             'name' => 'required|string',
@@ -34,6 +38,10 @@ class DisciplineController extends Controller
 
     public function update(Request $request, Discipline $discipline)
     {
+        if (!Auth::user()->hasPermissionTo('make_disciplines')) {
+            return response()->json(['message' => 'У вас нет прав на редактирование дисциплины'], 403);
+        }
+
         $validated = $request->validate([
             'code' => 'required|string|unique:disciplines,code,' . $discipline->id,
             'name' => 'required|string',
@@ -48,12 +56,20 @@ class DisciplineController extends Controller
 
     public function destroy(Discipline $discipline)
     {
+        if (!Auth::user()->hasPermissionTo('make_disciplines')) {
+            return response()->json(['message' => 'У вас нет прав на удаление дисциплины'], 403);
+        }
+
         $discipline->makeDeleted();
         return response()->json(['message' => 'Discipline deleted successfully']);
     }
 
     public function bindDisciplineToTeacher(Request $request)
     {
+        if (!Auth::user()->hasPermissionTo('make_disciplines')) {
+            return response()->json(['message' => 'У вас нет прав на назначение дисциплины'], 403);
+        }
+
         $validated = $request->validate([
             'teacher_id' => 'required|exists:teachers,user_id',
             'disciplines' => 'required|array|min:1',
