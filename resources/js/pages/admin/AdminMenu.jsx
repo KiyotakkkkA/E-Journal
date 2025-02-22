@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import MenuLayout from "../../layouts/MenuLayout";
-import axios from "../../axios";
 import { ServiceCard } from "../../components/common/ServiceCard";
 import { Icon } from "@iconify/react";
+import { observer } from "mobx-react-lite";
+import { notificationsStore } from "../../stores/notificationsStore";
 
-const AdminMenu = () => {
-    const [requestsCount, setRequestsCount] = useState(0);
+const AdminMenu = observer(() => {
     const [searchQuery, setSearchQuery] = useState("");
+    const requestsCount = notificationsStore.getRequestsCount();
 
     const services = [
         {
@@ -73,12 +74,6 @@ const AdminMenu = () => {
         );
     });
 
-    useEffect(() => {
-        axios.get("/api/admin/requests").then((res) => {
-            setRequestsCount(res.data.requestsCount);
-        });
-    }, []);
-
     return (
         <MenuLayout>
             <div className="container mx-auto px-4 py-8">
@@ -134,6 +129,6 @@ const AdminMenu = () => {
             </div>
         </MenuLayout>
     );
-};
+});
 
 export default AdminMenu;

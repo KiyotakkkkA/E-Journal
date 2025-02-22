@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
@@ -18,8 +19,17 @@ class MessageController extends Controller
                       ->orWhere('to_user_id', $userId);
             })
             ->orderBy('created_at', 'asc')
-            ->get()
-            ->map(function($message) {
+            ->get();
+
+        $unreadCounts = Message::where('to_user_id', $userId)
+            ->where('is_read', false)
+            ->groupBy('from_user_id')
+            ->selectRaw('from_user_id, COUNT(*) as unread_count')
+            ->pluck('unread_count', 'from_user_id')
+            ->toArray();
+
+        return response()->json([
+            'messages' => $messages->map(function($message) {
                 return [
                     'id' => $message->id,
                     'content' => $message->content,
@@ -30,9 +40,9 @@ class MessageController extends Controller
                     'from_user' => $message->fromUser,
                     'to_user' => $message->toUser
                 ];
-            });
-
-        return response()->json(['messages' => $messages]);
+            }),
+            'unread_counts' => $unreadCounts
+        ]);
     }
 
     public function sendMessage(Request $request)
@@ -51,11 +61,10 @@ class MessageController extends Controller
         return response()->json($message->load(['fromUser:id,name', 'toUser:id,name']));
     }
 
-    public function markAsRead(Message $message)
+    public function markAsRead(Request $request)
     {
-        if ($message->to_user_id === auth()->id()) {
-            $message->update(['is_read' => true]);
-        }
+        Message::where('from_user_id', $request->to_user_id)->where('is_read', 0)->update(['is_read' => 1]);
+
         return response()->json(['success' => true]);
     }
 }

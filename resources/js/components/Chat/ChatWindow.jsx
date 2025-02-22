@@ -4,6 +4,7 @@ import {
     useMessages,
     useOnlineUsers,
     useSendMessage,
+    useMarkAsRead,
 } from "../../scripts/hooks/useRealTimeQueries";
 
 export default function ChatWindow() {
@@ -14,25 +15,36 @@ export default function ChatWindow() {
     const messagesEndRef = useRef(null);
     const chatRef = useRef(null);
 
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
     const { data: messagesData } = useMessages();
 
-    const { data: onlineUsers } = useOnlineUsers(5000, true);
+    const { data: onlineUsers } = useOnlineUsers(5000, true, false);
 
-    const { mutate: sendMessage } = useSendMessage(setMessage, "");
+    const { mutate: sendMessage } = useSendMessage(
+        setMessage,
+        "",
+        scrollToBottom
+    );
+    const { mutate: markAsRead } = useMarkAsRead();
 
     const messages = messagesData?.messages || [];
+    const unreadCounts = messagesData?.unread_counts || {};
 
     const filteredUsers = onlineUsers?.filter((user) =>
         user.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    const getUnreadCount = (userId) => unreadCounts[userId] || 0;
 
     useEffect(() => {
+        if (selectedUser) {
+            markAsRead({ to_user_id: selectedUser.id });
+        }
         scrollToBottom();
-    }, [messages]);
+    }, [selectedUser]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -158,6 +170,14 @@ export default function ChatWindow() {
                                                         </div>
                                                     </div>
                                                     <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                                                    {getUnreadCount(user.id) >
+                                                        0 && (
+                                                        <span className="ml-2 px-2 py-1 bg-red-500 text-white rounded-full text-xs">
+                                                            {getUnreadCount(
+                                                                user.id
+                                                            )}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </button>
                                         ))}

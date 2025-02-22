@@ -14,9 +14,11 @@ use App\Http\Controllers\Api\UserStatusController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\StatisticsController;
 use App\Http\Controllers\Api\FileManagerController;
+use App\Http\Controllers\Api\NotificationsController;
 
 Route::middleware("web")->group(function () {
     Route::get("/check-auth", [AuthController::class, "checkAuth"]);
+    Route::get("/check-notifications", [NotificationsController::class, "getNotifications"]);
 });
 
 Route::middleware(['web', 'auth:sanctum'])->group(function () {
@@ -90,6 +92,7 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
     Route::prefix('messages')->group(function () {
         Route::get('/', [MessageController::class, 'getMessages']);
         Route::post('/send', [MessageController::class, 'sendMessage']);
+        Route::post('/mark-as-read', [MessageController::class, 'markAsRead']);
     });
 });
 

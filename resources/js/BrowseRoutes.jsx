@@ -101,9 +101,9 @@ export default function BrowseRoutes() {
                 <Route
                     path="/"
                     element={
-                        <PrivateRoute>
+                        <AuthorizedRoute>
                             <Main />
-                        </PrivateRoute>
+                        </AuthorizedRoute>
                     }
                 />
                 <Route

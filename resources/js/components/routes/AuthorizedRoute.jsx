@@ -5,7 +5,7 @@ const AuthorizedRoute = ({ children }) => {
     const { roles } = useAuth();
 
     if (!roles.isStudent && !roles.isTeacher && !roles.isAdmin) {
-        return <Navigate to="/" />;
+        return <Navigate to="/user" />;
     }
 
     return children;

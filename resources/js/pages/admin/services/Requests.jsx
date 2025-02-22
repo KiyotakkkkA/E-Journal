@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import MenuLayout from "../../../layouts/MenuLayout";
 import { Icon } from "@iconify/react";
-import AnimatedLoader from "../../../components/elements/AnimatedLoader";
 import { Link } from "react-router-dom";
+import {
+    useRequests,
+    useApproveRequest,
+    useRejectRequest,
+} from "../../../scripts/hooks/useRequestsQueries";
+import AnimatedLoader from "../../../components/elements/AnimatedLoader";
 import axios from "../../../axios";
 
 const RequestCard = ({ request, onApprove, onReject }) => {
@@ -93,44 +98,13 @@ const RequestCard = ({ request, onApprove, onReject }) => {
 };
 
 const Requests = () => {
-    const [requests, setRequests] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: requests, isLoading } = useRequests();
+    const { mutate: approveRequest, isPending: isApprovePending } =
+        useApproveRequest();
+    const { mutate: rejectRequest, isPending: isRejectPending } =
+        useRejectRequest();
 
-    useEffect(() => {
-        fetchRequests();
-    }, []);
-
-    const fetchRequests = async () => {
-        try {
-            setIsLoading(true);
-            const response = await axios.get("/api/admin/requests/all");
-            setRequests(response.data.requests);
-        } catch (error) {
-            console.error("Error fetching requests:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleApprove = async (requestId) => {
-        try {
-            await axios.post(`/admin/requests/${requestId}/approve`);
-            fetchRequests();
-        } catch (error) {
-            console.error("Error approving request:", error);
-        }
-    };
-
-    const handleReject = async (requestId) => {
-        try {
-            await axios.post(`/admin/requests/${requestId}/reject`);
-            fetchRequests();
-        } catch (error) {
-            console.error("Error rejecting request:", error);
-        }
-    };
-
-    if (isLoading)
+    if (isLoading || isApprovePending || isRejectPending)
         return (
             <MenuLayout>
                 <AnimatedLoader className="mt-4" />
@@ -190,8 +164,8 @@ const Requests = () => {
                             <RequestCard
                                 key={request.id}
                                 request={request}
-                                onApprove={handleApprove}
-                                onReject={handleReject}
+                                onApprove={approveRequest}
+                                onReject={rejectRequest}
                             />
                         ))}
                     </div>

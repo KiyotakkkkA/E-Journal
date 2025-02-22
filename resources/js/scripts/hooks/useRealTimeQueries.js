@@ -1,6 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "../../axios";
 
+export const useNotifications = (refetchInterval = 5000) => {
+    return useQuery({
+        queryKey: ["notifications"],
+        queryFn: async () => {
+            const response = await axios.get("/api/check-notifications");
+            return response.data;
+        },
+        refetchInterval: refetchInterval,
+    });
+};
+
 export const useMessages = () => {
     return useQuery({
         queryKey: ["messages"],
@@ -12,12 +23,28 @@ export const useMessages = () => {
     });
 };
 
-export const useOnlineUsers = (refetchInterval = 30000, withoutSelf = true) => {
+export const useMarkAsRead = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (data) => {
+            return axios.post(`/api/messages/mark-as-read`, data);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(["notifications"]);
+        },
+    });
+};
+
+export const useOnlineUsers = (
+    refetchInterval = 30000,
+    withoutSelf = true,
+    onlyOnline = true
+) => {
     return useQuery({
-        queryKey: ["online-users", withoutSelf],
+        queryKey: ["online-users", withoutSelf, onlyOnline],
         queryFn: async () => {
             const response = await axios.get(
-                `/api/online-users?without_self=${withoutSelf}`
+                `/api/online-users?without_self=${withoutSelf}&only_online=${onlyOnline}`
             );
             return response.data;
         },
@@ -25,7 +52,7 @@ export const useOnlineUsers = (refetchInterval = 30000, withoutSelf = true) => {
     });
 };
 
-export const useSendMessage = (msgFillerFunc, filler) => {
+export const useSendMessage = (msgFillerFunc, filler, afterSendFunc) => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (data) => {
@@ -36,7 +63,12 @@ export const useSendMessage = (msgFillerFunc, filler) => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries(["messages"]);
-            msgFillerFunc(filler);
+            if (msgFillerFunc) {
+                msgFillerFunc(filler);
+            }
+            if (afterSendFunc) {
+                afterSendFunc();
+            }
         },
     });
 };
