@@ -14,6 +14,8 @@ use App\Models\User;
 use App\Models\Teacher;
 use App\Models\Discipline;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Group;
+use App\Models\Student;
 
 class FileManagerController extends Controller
 {
@@ -21,7 +23,7 @@ class FileManagerController extends Controller
     {
         $request->validate([
             'file' => 'required|file|mimes:xlsx,xls',
-            'type' => 'required|string|in:teachers,institutes,cafedras,disciplines,lessons'
+            'type' => 'required|string|in:teachers,institutes,cafedras,disciplines,lessons,groups'
         ]);
 
         try {
@@ -37,6 +39,7 @@ class FileManagerController extends Controller
                 'institutes' => $this->importInstitutes($rows),
                 'cafedras' => $this->importCafedras($rows),
                 'disciplines' => $this->importDisciplines($rows),
+                'groups' => $this->importGroups($rows),
                 default => throw new \Exception('Неподдерживаемый тип данных')
             };
 
@@ -58,13 +61,26 @@ class FileManagerController extends Controller
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
-            match ($type) {
-                'teachers' => $this->exportTeachers($sheet),
-                'institutes' => $this->exportInstitutes($sheet),
-                'cafedras' => $this->exportCafedras($sheet),
-                'disciplines' => $this->exportDisciplines($sheet),
-                default => throw new \Exception('Неподдерживаемый тип данных')
-            };
+            switch ($type) {
+                case 'teachers':
+                    $this->exportTeachers($sheet);
+                    break;
+                case 'institutes':
+                    $this->exportInstitutes($sheet);
+                    break;
+                case 'cafedras':
+                    $this->exportCafedras($sheet);
+                    break;
+                case 'disciplines':
+                    $this->exportDisciplines($sheet);
+                    break;
+                case 'groups':
+                    $this->exportGroups($sheet);
+                    $filename = 'groups.xlsx';
+                    break;
+                default:
+                    throw new \Exception('Неподдерживаемый тип данных');
+            }
 
             $headerStyle = [
                 'font' => ['bold' => true],
@@ -114,6 +130,18 @@ class FileManagerController extends Controller
                 break;
             case 'disciplines':
                 $sheet->fromArray([['Код', 'Название', 'Типы дисциплин (через запятую, например: lc - лекция, p - практика, lb - лабораторная, s - семинар)']], null, 'A1');
+                break;
+            case 'groups':
+                $sheet->fromArray([
+                    ['Название группы', 'Макс. студентов', 'Email студента 1', 'Email студента 2', '...']
+                ], null, 'A1');
+                $sheet->getStyle('A1:E1')->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => 'E9ECEF']
+                    ]
+                ]);
                 break;
         }
 
@@ -350,6 +378,60 @@ class FileManagerController extends Controller
         ];
     }
 
+    private function importGroups($rows)
+    {
+        $stats = [
+            'created' => 0,
+            'updated' => 0,
+            'errors' => 0
+        ];
+
+        foreach ($rows as $row) {
+            try {
+                if (empty($row[0])) continue;
+
+                $groupData = [
+                    'name' => $row[0],
+                    'max_students' => $row[1] ?? 30,
+                    'is_active' => true
+                ];
+
+                $group = Group::updateOrCreate(
+                    ['name' => $groupData['name']],
+                    $groupData
+                );
+
+                if ($group->wasRecentlyCreated) {
+                    $stats['created']++;
+                } else {
+                    $stats['updated']++;
+                }
+
+                if (!empty($row[2])) {
+                    $studentEmails = array_slice($row, 2);
+                    foreach ($studentEmails as $email) {
+                        if (!empty($email)) {
+                            $student = Student::whereHas('user', function($query) use ($email) {
+                                $query->where('email', $email);
+                            })->first();
+
+                            if ($student) {
+                                $student->group_id = $group->id;
+                                $student->save();
+                            }
+                        }
+                    }
+                }
+
+            } catch (\Exception $e) {
+                Log::error("Ошибка импорта группы: " . $e->getMessage());
+                $stats['errors']++;
+            }
+        }
+
+        return $stats;
+    }
+
     private function exportTeachers($sheet)
     {
         $sheet->fromArray([['ФИО', 'Email', 'Название кафедры']], null, 'A1');
@@ -422,5 +504,46 @@ class FileManagerController extends Controller
             ]], null, "A{$row}");
             $row++;
         }
+    }
+
+    private function exportGroups($sheet)
+    {
+        $sheet->fromArray([
+            ['Название группы', 'Макс. студентов', 'Текущее кол-во', 'Студенты (email)']
+        ], null, 'A1');
+
+        $groups = Group::with(['students.user'])->where('is_active', true)->get();
+        $row = 2;
+
+        foreach ($groups as $group) {
+            $studentEmails = $group->students->map(function($student) {
+                return $student->user->email;
+            })->toArray();
+
+            $studentNames = $group->students->map(function($student) {
+                return $student->user->name;
+            })->toArray();
+
+            $data = [
+                $group->name,
+                $group->max_students,
+                $group->students->count()
+            ];
+
+            $data = array_merge($data, $studentEmails);
+            $data = array_merge($data, $studentNames);
+
+            $sheet->fromArray([$data], null, "A{$row}");
+
+            $row++;
+        }
+
+        $sheet->getStyle('A1:D1')->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E9ECEF']
+            ]
+        ]);
     }
 }

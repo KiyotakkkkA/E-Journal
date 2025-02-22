@@ -5,21 +5,53 @@ import { useMutation } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import axios from "@/axios";
 import { toast } from "react-toastify";
+import {
+    useUploadData,
+    useDownloadData,
+} from "../../../scripts/hooks/useFileManagerQueries";
 
 export default function FileManager() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadType, setUploadType] = useState("teachers");
+    const { mutate: uploadData, isPending: isUploading } = useUploadData();
+    const { mutate: downloadData, isPending: isDownloading } =
+        useDownloadData();
 
     const dataTypes = [
-        { id: "teachers", label: "Преподаватели", icon: "mdi:teacher" },
-        { id: "institutes", label: "Институты", icon: "mdi:building" },
-        { id: "cafedras", label: "Кафедры", icon: "mdi:office-building" },
-        { id: "disciplines", label: "Дисциплины", icon: "mdi:book" },
         {
-            id: "lessons",
-            label: "Занятия",
-            icon: "mdi:calendar",
-            disabled: true,
+            id: "teachers",
+            title: "Преподаватели",
+            icon: "mdi:account-tie",
+            description: "Импорт/экспорт списка преподавателей",
+            color: "text-blue-600 bg-blue-100",
+        },
+        {
+            id: "institutes",
+            title: "Институты",
+            icon: "mdi:domain",
+            description: "Импорт/экспорт списка институтов",
+            color: "text-purple-600 bg-purple-100",
+        },
+        {
+            id: "cafedras",
+            title: "Кафедры",
+            icon: "mdi:school",
+            description: "Импорт/экспорт списка кафедр",
+            color: "text-green-600 bg-green-100",
+        },
+        {
+            id: "disciplines",
+            title: "Дисциплины",
+            icon: "mdi:book-open-variant",
+            description: "Импорт/экспорт списка дисциплин",
+            color: "text-orange-600 bg-orange-100",
+        },
+        {
+            id: "groups",
+            title: "Группы",
+            icon: "mdi:account-group",
+            description: "Импорт/экспорт списка групп и их студентов",
+            color: "text-indigo-600 bg-indigo-100",
         },
     ];
 
@@ -126,6 +158,44 @@ export default function FileManager() {
         }
     };
 
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file || !uploadType) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("type", uploadType);
+
+        uploadData(formData, {
+            onSuccess: (response) => {
+                const { stats } = response;
+                let message = "";
+
+                if (uploadType === "groups") {
+                    message = `Создано: ${stats.created}, Обновлено: ${stats.updated}`;
+                    if (stats.errors > 0) {
+                        message += `, Ошибок: ${stats.errors}`;
+                    }
+                } else {
+                    message = `Добавлено: ${stats.added}`;
+                    if (stats.duplicates > 0) {
+                        message += `, Дубликатов: ${stats.duplicates}`;
+                    }
+                    if (stats.errors?.length > 0) {
+                        message += `, Ошибок: ${stats.errors.length}`;
+                    }
+                }
+
+                toast.success(`Данные успешно загружены. ${message}`);
+            },
+            onError: (error) => {
+                toast.error(
+                    error.response?.data?.error || "Ошибка при загрузке данных"
+                );
+            },
+        });
+    };
+
     return (
         <MenuLayout>
             <div className="container mx-auto px-4 py-8">
@@ -188,12 +258,8 @@ export default function FileManager() {
                                             <option
                                                 key={type.id}
                                                 value={type.id}
-                                                disabled={type.disabled}
                                             >
-                                                {type.label}
-                                                {type.disabled
-                                                    ? " (скоро)"
-                                                    : ""}
+                                                {type.title}
                                             </option>
                                         ))}
                                     </select>
@@ -225,7 +291,7 @@ export default function FileManager() {
                                     <input
                                         type="file"
                                         accept=".xlsx,.xls"
-                                        onChange={handleFileChange}
+                                        onChange={handleFileUpload}
                                         className="hidden"
                                         id="file-upload"
                                     />
@@ -285,10 +351,9 @@ export default function FileManager() {
                                 <button
                                     key={type.id}
                                     onClick={() => handleDownload(type.id)}
-                                    disabled={type.disabled}
                                     className={`w-full flex items-center gap-4 p-4 rounded-xl border
                                         ${
-                                            type.disabled
+                                            type.id === "lessons"
                                                 ? "opacity-50 cursor-not-allowed border-gray-100"
                                                 : "border-gray-200 hover:bg-gray-50"
                                         }
@@ -297,12 +362,12 @@ export default function FileManager() {
                                     <div className="p-3 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
                                         <Icon
                                             icon={type.icon}
-                                            className="text-2xl text-purple-600"
+                                            className={`text-2xl ${type.color}`}
                                         />
                                     </div>
                                     <span className="flex-1 text-left font-medium text-gray-700">
-                                        Выгрузить {type.label.toLowerCase()}
-                                        {type.disabled && " (скоро)"}
+                                        Выгрузить {type.title.toLowerCase()}
+                                        {type.id === "lessons" && " (скоро)"}
                                     </span>
                                     <Icon
                                         icon="mdi:download"

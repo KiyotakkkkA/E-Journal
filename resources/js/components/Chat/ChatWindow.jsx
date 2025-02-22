@@ -6,14 +6,18 @@ import {
     useSendMessage,
     useMarkAsRead,
 } from "../../scripts/hooks/useRealTimeQueries";
+import { notificationsStore } from "../../stores/notificationsStore";
+import { observer } from "mobx-react-lite";
 
-export default function ChatWindow() {
+const ChatWindow = observer(() => {
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [selectedUser, setSelectedUser] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const messagesEndRef = useRef(null);
     const chatRef = useRef(null);
+
+    const messagesCount = notificationsStore.getMessagesCount();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -82,6 +86,11 @@ export default function ChatWindow() {
                     <span className="font-medium text-gray-900">
                         Чат пользователей онлайн
                     </span>
+                    {messagesCount > 0 && (
+                        <span className="ml-2 px-2 py-1 bg-red-500 text-white rounded-full text-xs">
+                            {messagesCount}
+                        </span>
+                    )}
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-500">
@@ -325,4 +334,6 @@ export default function ChatWindow() {
             )}
         </div>
     );
-}
+});
+
+export default ChatWindow;
