@@ -20,7 +20,8 @@ class RolesAndPermsSeeder extends Seeder
                 'name' => 'Администратор',
                 'permissions' => ['be_admin', 'view_admin_panel',
                     'make_requests', 'make_schedule', 'make_users', 'view_all_schedule',
-                    'view_all_groups', 'view_all_groups_history', 'make_groups', 'make_requests', 'make_structure', 'make_disciplines']
+                    'view_all_groups', 'view_all_groups_history', 'make_groups', 'make_requests',
+                    'make_structure', 'make_disciplines', 'make_attendance']
             ],
             [
                 'name' => 'Преподаватель',

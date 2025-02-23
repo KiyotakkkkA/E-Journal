@@ -23,6 +23,11 @@ class Group extends Model
         return $this->hasMany(GroupHistory::class);
     }
 
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
     private function makeDeleted()
     {
         $this->history()->create([

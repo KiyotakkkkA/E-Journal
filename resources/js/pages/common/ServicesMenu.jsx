@@ -17,14 +17,20 @@ const servicesTextForRoles = {
                 "параметры",
             ],
         },
-        // ... другие сервисы для админа
+        attendance: {
+            description: "Администрирование посещаемости",
+            keywords: ["посещаемость", "администрирование", "группы"],
+        },
     },
     isTeacher: {
         schedule: {
             description: "Просмотр вашего расписания занятий",
             keywords: ["расписание", "занятия", "пары"],
         },
-        // ... другие сервисы для преподавателя
+        attendance: {
+            description: "Выставление посещаемости",
+            keywords: ["посещаемость", "выставление", "группы"],
+        },
     },
     isStudent: {
         groups: {
@@ -35,7 +41,11 @@ const servicesTextForRoles = {
             description: "Просмотр расписания занятий вашей группы",
             keywords: ["расписание", "занятия", "пары"],
         },
-        // ... другие сервисы для студента
+
+        attendance: {
+            description: "Просмотр посещаемости вашей группы",
+            keywords: ["посещаемость", "просмотр", "моя группа"],
+        },
     },
 };
 
@@ -74,7 +84,13 @@ const ServicesMenu = () => {
             ref: "/services/disciplines",
             color: "#9C27B0",
         },
-        // ... другие сервисы
+        {
+            key: "attendance",
+            title: "Посещаемость",
+            icon: "mdi:clipboard-text-clock",
+            ref: "/services/attendance",
+            color: "#FF5722",
+        },
     ];
 
     const services = availableServices

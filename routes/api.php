@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\FileManagerController;
 use App\Http\Controllers\Api\NotificationsController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\AuditoriumController;
+use App\Http\Controllers\Api\AttendanceController;
 
 Route::middleware("web")->group(function () {
     Route::get("/check-auth", [AuthController::class, "checkAuth"]);
@@ -97,6 +98,14 @@ Route::prefix('services')->middleware(['web', 'auth:sanctum'])->group(function (
     Route::prefix('groups')->group(function () {
         Route::get('/students', [GroupController::class, 'getStudents']);
     });
+
+    Route::prefix('attendance')->group(function () {
+        Route::get('/', [AttendanceController::class, 'index']);
+        Route::post('/', [AttendanceController::class, 'store']);
+        Route::get('/student', [AttendanceController::class, 'getStudentAttendance']);
+    });
+
+    Route::post('/services/attendance/confirm', [AttendanceController::class, 'confirmAttendance']);
 });
 
 Route::middleware(['web', 'auth:sanctum'])->group(function () {
