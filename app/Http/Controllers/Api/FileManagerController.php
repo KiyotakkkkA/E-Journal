@@ -16,6 +16,10 @@ use App\Models\Discipline;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Group;
 use App\Models\Student;
+use App\Mail\StudentRegistration;
+use App\Mail\TeacherRegistration;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class FileManagerController extends Controller
 {
@@ -23,7 +27,7 @@ class FileManagerController extends Controller
     {
         $request->validate([
             'file' => 'required|file|mimes:xlsx,xls',
-            'type' => 'required|string|in:teachers,institutes,cafedras,disciplines,lessons,groups'
+            'type' => 'required|string|in:teachers,institutes,cafedras,disciplines,lessons,groups,students'
         ]);
 
         try {
@@ -40,6 +44,7 @@ class FileManagerController extends Controller
                 'cafedras' => $this->importCafedras($rows),
                 'disciplines' => $this->importDisciplines($rows),
                 'groups' => $this->importGroups($rows),
+                'students' => $this->importStudents($rows),
                 default => throw new \Exception('Неподдерживаемый тип данных')
             };
 
@@ -77,6 +82,10 @@ class FileManagerController extends Controller
                 case 'groups':
                     $this->exportGroups($sheet);
                     $filename = 'groups.xlsx';
+                    break;
+                case 'students':
+                    $this->exportStudents($sheet);
+                    $filename = 'students.xlsx';
                     break;
                 default:
                     throw new \Exception('Неподдерживаемый тип данных');
@@ -133,15 +142,18 @@ class FileManagerController extends Controller
                 break;
             case 'groups':
                 $sheet->fromArray([
-                    ['Название группы', 'Макс. студентов', 'Email студента 1', 'Email студента 2', '...']
+                    ['Название группы', 'Макс. студентов']
                 ], null, 'A1');
-                $sheet->getStyle('A1:E1')->applyFromArray([
+                $sheet->getStyle('A1:B1')->applyFromArray([
                     'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'startColor' => ['rgb' => 'E9ECEF']
                     ]
                 ]);
+                break;
+            case 'students':
+                $sheet->fromArray([['ФИО', 'Email', 'Пароль', 'Группа']], null, 'A1');
                 break;
         }
 
@@ -195,20 +207,40 @@ class FileManagerController extends Controller
                     'email' => $row[2],
                     'role_id' => 2,
                     'password' => Hash::make($row[1]),
+                    'email_verified_at' => now()
                 ]);
+
+                $cafedraName = null;
+                $teacherData = [
+                    'position' => 'Преподаватель',
+                    'degree' => '-'
+                ];
 
                 if (!empty($row[3])) {
                     $cafedra = Cafedra::whereRaw('LOWER(name) = ?', [strtolower($row[3])])->first();
                     if ($cafedra) {
-                        Teacher::create([
-                            'user_id' => $user->id,
-                            'cafedra_id' => $cafedra->id,
-                            'position' => 'Преподаватель',
-                            'degree' => '-'
-                        ]);
+                        $teacherData['cafedra_id'] = $cafedra->id;
+                        $cafedraName = $cafedra->name;
                     } else {
                         $errors[] = "Строка " . ($index + 2) . ": Кафедра '{$row[3]}' не найдена";
                     }
+                }
+
+                Teacher::create(array_merge($teacherData, ['user_id' => $user->id]));
+
+                try {
+                    Mail::to($user->email)->send(new TeacherRegistration([
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'password' => $row[1],
+                        'cafedraName' => $cafedraName ?? 'Не назначена',
+                        'position' => $teacherData['position'],
+                        'degree' => $teacherData['degree'],
+                        'loginUrl' => route('login')
+                    ]));
+                } catch (\Exception $e) {
+                    Log::error("Ошибка отправки email преподавателю: " . $e->getMessage());
+                    $errors[] = "Строка " . ($index + 2) . ": Не удалось отправить email";
                 }
 
                 $addedCount++;
@@ -383,7 +415,8 @@ class FileManagerController extends Controller
         $stats = [
             'created' => 0,
             'updated' => 0,
-            'errors' => 0
+            'errors' => 0,
+            'emailErrors' => []
         ];
 
         foreach ($rows as $row) {
@@ -407,22 +440,6 @@ class FileManagerController extends Controller
                     $stats['updated']++;
                 }
 
-                if (!empty($row[2])) {
-                    $studentEmails = array_slice($row, 2);
-                    foreach ($studentEmails as $email) {
-                        if (!empty($email)) {
-                            $student = Student::whereHas('user', function($query) use ($email) {
-                                $query->where('email', $email);
-                            })->first();
-
-                            if ($student) {
-                                $student->group_id = $group->id;
-                                $student->save();
-                            }
-                        }
-                    }
-                }
-
             } catch (\Exception $e) {
                 Log::error("Ошибка импорта группы: " . $e->getMessage());
                 $stats['errors']++;
@@ -430,6 +447,76 @@ class FileManagerController extends Controller
         }
 
         return $stats;
+    }
+
+    private function importStudents($rows)
+    {
+        $addedCount = 0;
+        $duplicateCount = 0;
+        $errors = [];
+
+        foreach ($rows as $index => $row) {
+            try {
+                if (empty($row[0]) || empty($row[1]) || empty($row[2]) || empty($row[3])) {
+                    continue;
+                }
+
+                $name = $row[0];
+                $email = $row[1];
+                $password = $row[2];
+                $groupName = $row[3];
+
+                $existingUser = User::where('email', $email)->first();
+                if ($existingUser) {
+                    $errors[] = "Строка " . ($index + 2) . ": Пользователь с email '{$email}' уже существует";
+                    $duplicateCount++;
+                    continue;
+                }
+
+                $group = Group::where('name', $groupName)->first();
+                if (!$group) {
+                    $errors[] = "Строка " . ($index + 2) . ": Группа '{$groupName}' не найдена";
+                    continue;
+                }
+
+                $user = User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => Hash::make($password),
+                    'role_id' => 3,
+                    'email_verified_at' => now()
+                ]);
+
+                Student::create([
+                    'student_code' => Student::generateUniqueCode(),
+                    'user_id' => $user->id,
+                    'group_id' => $group->id
+                ]);
+
+                try {
+                    Mail::to($email)->send(new StudentRegistration([
+                        'email' => $email,
+                        'password' => $password,
+                        'groupName' => $groupName,
+                        'loginUrl' => route('login')
+                    ]));
+                } catch (\Exception $e) {
+                    Log::error("Ошибка отправки email студенту: " . $e->getMessage());
+                    $errors[] = "Строка " . ($index + 2) . ": Не удалось отправить email";
+                }
+
+                $addedCount++;
+            } catch (\Exception $e) {
+                Log::error("Ошибка импорта студента: " . $e->getMessage());
+                $errors[] = "Строка " . ($index + 2) . ": " . $e->getMessage();
+            }
+        }
+
+        return [
+            'added' => $addedCount,
+            'duplicate' => $duplicateCount,
+            'errors' => $errors
+        ];
     }
 
     private function exportTeachers($sheet)
@@ -539,6 +626,39 @@ class FileManagerController extends Controller
         }
 
         $sheet->getStyle('A1:D1')->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E9ECEF']
+            ]
+        ]);
+    }
+
+    private function exportStudents($sheet)
+    {
+        $sheet->fromArray([['ФИО', 'Email', 'Группа']], null, 'A1');
+
+        $students = Student::with(['user', 'group'])->get();
+        $row = 2;
+
+        foreach ($students as $student) {
+            if ($student->user) {
+                $sheet->fromArray([
+                    [
+                        $student->user->name,
+                        $student->user->email,
+                        $student->group ? $student->group->name : ''
+                    ]
+                ], null, "A{$row}");
+                $row++;
+            }
+        }
+
+        $sheet->getColumnDimension('A')->setWidth(30);
+        $sheet->getColumnDimension('B')->setWidth(30);
+        $sheet->getColumnDimension('C')->setWidth(20);
+
+        $sheet->getStyle('A1:C1')->applyFromArray([
             'font' => ['bold' => true],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,

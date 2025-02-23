@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import MenuLayout from "@/layouts/MenuLayout";
 import { Icon } from "@iconify/react";
 import { useMutation } from "@tanstack/react-query";
@@ -10,9 +10,49 @@ import {
     useDownloadData,
 } from "../../../scripts/hooks/useFileManagerQueries";
 
+const uploadOrder = [
+    {
+        step: 1,
+        type: "institutes",
+        title: "Институты",
+        description: "Загрузите список институтов",
+    },
+    {
+        step: 2,
+        type: "cafedras",
+        title: "Кафедры",
+        description: "Загрузите список кафедр с привязкой к институтам",
+    },
+    {
+        step: 3,
+        type: "teachers",
+        title: "Преподаватели",
+        description: "Загрузите список преподавателей с привязкой к кафедрам",
+    },
+    {
+        step: 4,
+        type: "disciplines",
+        title: "Дисциплины",
+        description: "Загрузите список дисциплин",
+    },
+    {
+        step: 5,
+        type: "groups",
+        title: "Группы",
+        description: "Загрузите список учебных групп",
+    },
+    {
+        step: 6,
+        type: "students",
+        title: "Студенты",
+        description: "Загрузите список студентов с привязкой к группам",
+    },
+];
+
 export default function FileManager() {
+    const [selectedType, setSelectedType] = useState("");
     const [selectedFile, setSelectedFile] = useState(null);
-    const [uploadType, setUploadType] = useState("teachers");
+    const [uploadedTypes, setUploadedTypes] = useState([]);
     const { mutate: uploadDataMutation, isPending: isUploading } =
         useUploadData();
     const { mutate: downloadData, isPending: isDownloading } =
@@ -31,7 +71,7 @@ export default function FileManager() {
             title: "Институты",
             icon: "mdi:domain",
             description: "Импорт/экспорт списка институтов",
-            color: "text-purple-600 bg-purple-100",
+            color: "text-green-600 bg-green-100",
         },
         {
             id: "cafedras",
@@ -54,48 +94,14 @@ export default function FileManager() {
             description: "Импорт/экспорт списка групп и их студентов",
             color: "text-indigo-600 bg-indigo-100",
         },
+        {
+            id: "students",
+            title: "Студенты",
+            icon: "mdi:account-school",
+            description: "Импорт/экспорт списка студентов",
+            color: "text-green-600",
+        },
     ];
-
-    const uploadMutation = useMutation({
-        mutationFn: async () => {
-            const formData = new FormData();
-            formData.append("file", selectedFile);
-            formData.append("type", uploadType);
-            return axios.post("/api/admin/upload-data", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-        },
-        onSuccess: (response) => {
-            const { stats } = response.data;
-            toast.success(
-                <div>
-                    <div>Данные успешно загружены!</div>
-                    <div className="text-sm mt-1">
-                        Добавлено: {stats.added}
-                        {stats.duplicates > 0 &&
-                            `, Дубликатов: ${stats.duplicates}`}
-                    </div>
-                    {stats.errors?.length > 0 && (
-                        <div className="text-sm mt-1 text-red-500">
-                            <div>Ошибки ({stats.errors.length}):</div>
-                            <ul className="list-disc pl-4 mt-1">
-                                {stats.errors.map((error, index) => (
-                                    <li key={index}>{error}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                </div>
-            );
-            setSelectedFile(null);
-        },
-        onError: (error) => {
-            toast.error(
-                error.response?.data?.error ||
-                    "Произошла ошибка при загрузке файла"
-            );
-        },
-    });
 
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
@@ -103,18 +109,20 @@ export default function FileManager() {
     };
 
     const handleUpload = () => {
-        if (!selectedFile || !uploadType) return;
+        if (!selectedFile || !selectedType) {
+            return;
+        }
 
         const formData = new FormData();
         formData.append("file", selectedFile);
-        formData.append("type", uploadType);
+        formData.append("type", selectedType);
 
         uploadDataMutation(formData, {
             onSuccess: (response) => {
                 const { stats } = response;
                 let message = "";
 
-                if (uploadType === "groups") {
+                if (selectedType === "groups") {
                     message = `Создано: ${stats.created}, Обновлено: ${stats.updated}`;
                     if (stats.errors > 0) {
                         message += `, Ошибок: ${stats.errors}`;
@@ -131,8 +139,11 @@ export default function FileManager() {
 
                 toast.success(`Данные успешно загружены. ${message}`);
                 setSelectedFile(null);
+                setSelectedType("");
+                setUploadedTypes((prev) => [...prev, selectedType]);
             },
             onError: (error) => {
+                console.error("Upload error:", error);
                 toast.error(
                     error.response?.data?.error || "Ошибка при загрузке данных"
                 );
@@ -239,13 +250,15 @@ export default function FileManager() {
                                 </label>
                                 <div className="relative">
                                     <select
-                                        value={uploadType}
-                                        onChange={(e) =>
-                                            setUploadType(e.target.value)
-                                        }
-                                        className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl
-                                            px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                        value={selectedType}
+                                        onChange={(e) => {
+                                            setSelectedType(e.target.value);
+                                        }}
+                                        className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 pr-8 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     >
+                                        <option value="">
+                                            Выберите тип данных
+                                        </option>
                                         {dataTypes.map((type) => (
                                             <option
                                                 key={type.id}
@@ -262,7 +275,7 @@ export default function FileManager() {
                                 </div>
                                 <button
                                     onClick={() =>
-                                        handleDownloadTemplate(uploadType)
+                                        handleDownloadTemplate(selectedType)
                                     }
                                     className="mt-2 text-sm text-purple-600 hover:text-purple-700
                                         flex items-center gap-1 transition-colors"
@@ -302,6 +315,46 @@ export default function FileManager() {
                                                 : "Выберите файл"}
                                         </span>
                                     </label>
+                                </div>
+                            </div>
+
+                            <div className="mb-6 bg-gray-50 rounded-lg p-4">
+                                <h3 className="text-sm font-medium text-gray-800 mb-3 flex items-center gap-2">
+                                    <Icon
+                                        icon="mdi:information"
+                                        className="text-lg text-blue-500"
+                                    />
+                                    Порядок загрузки данных
+                                </h3>
+                                <div className="space-y-2">
+                                    {uploadOrder.map((item) => (
+                                        <div
+                                            key={item.type}
+                                            className="flex items-center gap-3"
+                                        >
+                                            <div className="flex-shrink-0 w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-sm font-semibold">
+                                                {item.step}
+                                            </div>
+                                            <div className="flex items-center justify-between flex-1">
+                                                <p className="text-sm text-gray-900">
+                                                    {item.title}
+                                                </p>
+                                                {uploadedTypes.includes(
+                                                    item.type
+                                                ) && (
+                                                    <Icon
+                                                        icon="mdi:check-circle"
+                                                        className="text-lg text-green-500"
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="mt-3 text-xs text-yellow-800">
+                                    <strong>Важно:</strong> Соблюдайте указанный
+                                    порядок загрузки для корректной работы
+                                    системы
                                 </div>
                             </div>
 
