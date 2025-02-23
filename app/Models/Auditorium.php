@@ -15,17 +15,24 @@ class Auditorium extends Model
         'name',
         'type',
         'capacity',
+        'floor',
         'equipment',
         'has_projector',
         'has_internet',
         'description',
-        'is_active',
+        'position_x',
+        'position_y',
+        'is_active'
     ];
 
     protected $casts = [
-        'equipment' => 'array',
-        'is_active' => 'boolean',
+        'position_x' => 'integer',
+        'position_y' => 'integer',
+        'floor' => 'integer',
+        'capacity' => 'integer',
         'has_projector' => 'boolean',
         'has_internet' => 'boolean',
+        'is_active' => 'boolean',
+        'equipment' => 'array'
     ];
 }

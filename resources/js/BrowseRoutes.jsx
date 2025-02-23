@@ -8,6 +8,7 @@ import Groups from "./pages/common/services/Groups";
 import STSchedules from "./pages/common/services/Schedule";
 import ServicesMenu from "./pages/common/ServicesMenu";
 import Attendance from "./pages/common/services/Attendance";
+import Reserve from "./pages/common/services/Reserve";
 import Requests from "./pages/admin/services/Requests";
 import OrgStructure from "./pages/admin/services/OrgStructure";
 import Disciplines from "./pages/admin/services/Disciplines";
@@ -155,6 +156,14 @@ export default function BrowseRoutes() {
                     element={
                         <AuthorizedRoute>
                             <Attendance />
+                        </AuthorizedRoute>
+                    }
+                />
+                <Route
+                    path="/services/reserve"
+                    element={
+                        <AuthorizedRoute>
+                            <Reserve />
                         </AuthorizedRoute>
                     }
                 />

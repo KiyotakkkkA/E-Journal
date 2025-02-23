@@ -85,6 +85,15 @@ const AuditoriumCard = ({ auditorium, onEdit, onDelete }) => {
             <div className="space-y-3">
                 <div className="flex items-center gap-2">
                     <Icon
+                        icon="mdi:floor-plan"
+                        className="text-xl text-gray-400"
+                    />
+                    <span className="text-gray-600">
+                        Этаж: {auditorium.floor}
+                    </span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Icon
                         icon="mdi:account-group"
                         className="text-xl text-gray-400"
                     />

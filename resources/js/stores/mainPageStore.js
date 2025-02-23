@@ -5,6 +5,7 @@ class MainPageStore {
         students: 0,
         groups: 0,
         teachers: 0,
+        lessons: 0,
     };
 
     constructor() {

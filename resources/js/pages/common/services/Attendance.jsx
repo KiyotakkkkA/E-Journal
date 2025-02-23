@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import MenuLayout from "../../../layouts/MenuLayout";
 import { useAuth } from "../../../contexts/AuthContext";
 import { Icon } from "@iconify/react";
+import { Link } from "react-router-dom";
 import AttendanceTable from "../../../components/attendance/AttendanceTable";
 import GroupSelector from "../../../components/attendance/GroupSelector";
 import DateSelector from "../../../components/attendance/DateSelector";
@@ -16,9 +17,27 @@ export default function Attendance() {
         <MenuLayout>
             <div className="p-8">
                 <div className="mb-8">
-                    <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-                        Посещаемость
-                    </h1>
+                    <div className="flex items-center justify-between mb-2">
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                            Посещаемость
+                        </h1>
+                        <Link
+                            to="/services"
+                            className="text-gray-500 hover:text-gray-600
+                                    transition-all duration-200 transform
+                                    hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                            <div
+                                className="w-12 h-12 rounded-lg flex items-center justify-center
+                                    bg-gray-100 hover:bg-gray-200 transition-all duration-200"
+                            >
+                                <Icon
+                                    icon="mdi:arrow-left"
+                                    className="text-xl"
+                                />
+                            </div>
+                        </Link>
+                    </div>
                     <p className="text-gray-600">
                         {canManageAttendance
                             ? "Управление посещаемостью студентов"

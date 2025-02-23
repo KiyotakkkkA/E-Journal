@@ -6,9 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Auditorium;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AuditoriumController extends Controller
 {
+
+    public function getInteractive()
+    {
+        return Auditorium::where('is_active', true)->orderBy('number')->get();
+    }
+
     public function index()
     {
         return Auditorium::where('is_active', true)->get();
@@ -25,6 +32,7 @@ class AuditoriumController extends Controller
             'name' => 'nullable|string',
             'type' => 'required|in:regular,lecture,computer,laboratory,conference',
             'capacity' => 'required|integer|min:1',
+            'floor' => 'required|integer|min:1|max:5',
             'equipment' => 'nullable|array',
             'has_projector' => 'boolean',
             'has_internet' => 'boolean',
@@ -39,21 +47,28 @@ class AuditoriumController extends Controller
     public function update(Request $request, Auditorium $auditorium)
     {
         if (!Auth::user()->hasPermissionTo('make_structure')) {
-            return response()->json(['message' => 'У вас нет прав на редактирование аудитории'], 403);
+            return response()->json(['message' => 'No permission'], 403);
         }
 
-        $validated = $request->validate([
-            'number' => 'required|string|unique:auditoriums,number,' . $auditorium->id,
+        $validator = Validator::make($request->all(), [
+            'number' => 'sometimes|required|string',
+            'type' => 'sometimes|required|string',
+            'capacity' => 'sometimes|required|integer',
+            'floor' => 'sometimes|required|integer',
+            'position_x' => 'sometimes|required|integer',
+            'position_y' => 'sometimes|required|integer',
             'name' => 'nullable|string',
-            'type' => 'required|in:regular,lecture,computer,laboratory,conference',
-            'capacity' => 'required|integer|min:1',
             'equipment' => 'nullable|array',
             'has_projector' => 'boolean',
             'has_internet' => 'boolean',
             'description' => 'nullable|string'
         ]);
 
-        $auditorium->update($validated);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $auditorium->update($request->all());
 
         return response()->json($auditorium);
     }

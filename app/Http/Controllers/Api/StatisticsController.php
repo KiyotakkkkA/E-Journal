@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Group;
+use Carbon\Carbon;
+use App\Models\Schedule;
+use Illuminate\Support\Facades\Log;
 
 class StatisticsController extends Controller
 {
@@ -22,6 +25,8 @@ class StatisticsController extends Controller
         $students = Student::count();
         $teachers = Teacher::count();
         $groups = Group::where('is_active', true)->count();
-        return response()->json(['students' => $students, 'teachers' => $teachers, 'groups' => $groups]);
+        $lessons = Schedule::where('day_of_week', strtolower(Carbon::now()->locale('en')->isoFormat('dddd')))->count();
+
+        return response()->json(['students' => $students, 'teachers' => $teachers, 'groups' => $groups, 'lessons' => $lessons]);
     }
 }

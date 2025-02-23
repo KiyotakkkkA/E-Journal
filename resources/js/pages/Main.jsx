@@ -79,7 +79,7 @@ const Main = observer(() => {
         {
             icon: "mdi:calendar-check",
             title: "Занятий сегодня",
-            value: "42",
+            value: totalStats.lessons,
             color: { bg: "bg-green-500", text: "text-green-500" },
         },
     ];

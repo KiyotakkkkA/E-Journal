@@ -21,6 +21,10 @@ const servicesTextForRoles = {
             description: "Администрирование посещаемости",
             keywords: ["посещаемость", "администрирование", "группы"],
         },
+        reserve: {
+            description: "Бронирование аудиторий",
+            keywords: ["бронирование", "аудитории", "группы"],
+        },
     },
     isTeacher: {
         schedule: {
@@ -30,6 +34,10 @@ const servicesTextForRoles = {
         attendance: {
             description: "Выставление посещаемости",
             keywords: ["посещаемость", "выставление", "группы"],
+        },
+        reserve: {
+            description: "Бронирование аудиторий",
+            keywords: ["бронирование", "аудитории", "группы"],
         },
     },
     isStudent: {
@@ -45,6 +53,10 @@ const servicesTextForRoles = {
         attendance: {
             description: "Просмотр посещаемости вашей группы",
             keywords: ["посещаемость", "просмотр", "моя группа"],
+        },
+        reserve: {
+            description: "Бронирование аудиторий",
+            keywords: ["бронирование", "аудитории", "группы"],
         },
     },
 };
@@ -90,6 +102,13 @@ const ServicesMenu = () => {
             icon: "mdi:clipboard-text-clock",
             ref: "/services/attendance",
             color: "#FF5722",
+        },
+        {
+            key: "reserve",
+            title: "Бронирование аудиторий",
+            icon: "mdi:book-open-variant",
+            ref: "/services/reserve",
+            color: "#ab274f",
         },
     ];
 

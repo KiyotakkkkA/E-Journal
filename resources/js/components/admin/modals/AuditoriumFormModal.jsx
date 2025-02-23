@@ -27,6 +27,7 @@ export default function AuditoriumFormModal({
         number: "",
         name: "",
         type: "regular",
+        floor: "",
         capacity: "",
         equipment: [],
         has_projector: false,
@@ -42,6 +43,7 @@ export default function AuditoriumFormModal({
                 name: auditorium.name || "",
                 type: auditorium.type,
                 capacity: auditorium.capacity,
+                floor: auditorium.floor,
                 equipment: auditorium.equipment || [],
                 has_projector: auditorium.has_projector,
                 has_internet: auditorium.has_internet,
@@ -137,6 +139,24 @@ export default function AuditoriumFormModal({
                                 placeholder="Например: Лекционный зал"
                             />
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Этаж
+                        </label>
+                        <input
+                            type="number"
+                            value={formData.floor}
+                            onChange={(e) =>
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    floor: e.target.value,
+                                }))
+                            }
+                            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="Например: 1"
+                        />
                     </div>
 
                     <div>

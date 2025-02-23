@@ -21,6 +21,7 @@
   <img src="https://img.shields.io/badge/Sanctum-FF4154?style=for-the-badge&logo=sanctum&logoColor=white" alt="Sanctum"/>
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript"/>
   <img src="https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP"/>
+  <img src="https://img.shields.io/badge/React%20Draggable-FF4154?style=for-the-badge&logo=react%20draggable&logoColor=white" alt="React Draggable"/>
 </div>
 
 ### 🔑 Основной функционал

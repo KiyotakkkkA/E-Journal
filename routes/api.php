@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\NotificationsController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\AuditoriumController;
 use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\MapElementController;
 
 Route::middleware("web")->group(function () {
     Route::get("/check-auth", [AuthController::class, "checkAuth"]);
@@ -106,6 +107,8 @@ Route::prefix('services')->middleware(['web', 'auth:sanctum'])->group(function (
     });
 
     Route::post('/services/attendance/confirm', [AttendanceController::class, 'confirmAttendance']);
+
+    Route::get('/auditoriums', [AuditoriumController::class, 'getInteractive']);
 });
 
 Route::middleware(['web', 'auth:sanctum'])->group(function () {
@@ -119,5 +122,10 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
         Route::post('/send', [MessageController::class, 'sendMessage']);
         Route::post('/mark-as-read', [MessageController::class, 'markAsRead']);
     });
+
+    Route::post('/map-elements', [MapElementController::class, 'store']);
+    Route::put('/map-elements/{id}', [MapElementController::class, 'update']);
+    Route::get('/map-elements', [MapElementController::class, 'index']);
+    Route::delete('/map-elements/{id}', [MapElementController::class, 'destroy']);
 });
 
