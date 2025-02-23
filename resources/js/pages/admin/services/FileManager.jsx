@@ -13,7 +13,8 @@ import {
 export default function FileManager() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploadType, setUploadType] = useState("teachers");
-    const { mutate: uploadData, isPending: isUploading } = useUploadData();
+    const { mutate: uploadDataMutation, isPending: isUploading } =
+        useUploadData();
     const { mutate: downloadData, isPending: isDownloading } =
         useDownloadData();
 
@@ -96,18 +97,47 @@ export default function FileManager() {
         },
     });
 
-    const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        setSelectedFile(file);
     };
 
     const handleUpload = () => {
-        if (uploadType === "lessons") {
-            toast.info("Загрузка занятий пока не поддерживается");
-            return;
-        }
-        if (selectedFile) {
-            uploadMutation.mutate();
-        }
+        if (!selectedFile || !uploadType) return;
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("type", uploadType);
+
+        uploadDataMutation(formData, {
+            onSuccess: (response) => {
+                const { stats } = response;
+                let message = "";
+
+                if (uploadType === "groups") {
+                    message = `Создано: ${stats.created}, Обновлено: ${stats.updated}`;
+                    if (stats.errors > 0) {
+                        message += `, Ошибок: ${stats.errors}`;
+                    }
+                } else {
+                    message = `Добавлено: ${stats.added}`;
+                    if (stats.duplicates > 0) {
+                        message += `, Дубликатов: ${stats.duplicates}`;
+                    }
+                    if (stats.errors?.length > 0) {
+                        message += `, Ошибок: ${stats.errors.length}`;
+                    }
+                }
+
+                toast.success(`Данные успешно загружены. ${message}`);
+                setSelectedFile(null);
+            },
+            onError: (error) => {
+                toast.error(
+                    error.response?.data?.error || "Ошибка при загрузке данных"
+                );
+            },
+        });
     };
 
     const handleDownload = async (type) => {
@@ -156,44 +186,6 @@ export default function FileManager() {
         } catch (error) {
             console.error("Ошибка при скачивании шаблона:", error);
         }
-    };
-
-    const handleFileUpload = (event) => {
-        const file = event.target.files[0];
-        if (!file || !uploadType) return;
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("type", uploadType);
-
-        uploadData(formData, {
-            onSuccess: (response) => {
-                const { stats } = response;
-                let message = "";
-
-                if (uploadType === "groups") {
-                    message = `Создано: ${stats.created}, Обновлено: ${stats.updated}`;
-                    if (stats.errors > 0) {
-                        message += `, Ошибок: ${stats.errors}`;
-                    }
-                } else {
-                    message = `Добавлено: ${stats.added}`;
-                    if (stats.duplicates > 0) {
-                        message += `, Дубликатов: ${stats.duplicates}`;
-                    }
-                    if (stats.errors?.length > 0) {
-                        message += `, Ошибок: ${stats.errors.length}`;
-                    }
-                }
-
-                toast.success(`Данные успешно загружены. ${message}`);
-            },
-            onError: (error) => {
-                toast.error(
-                    error.response?.data?.error || "Ошибка при загрузке данных"
-                );
-            },
-        });
     };
 
     return (
@@ -315,9 +307,7 @@ export default function FileManager() {
 
                             <button
                                 onClick={handleUpload}
-                                disabled={
-                                    !selectedFile || uploadMutation.isPending
-                                }
+                                disabled={!selectedFile || isUploading}
                                 className="w-full bg-purple-600 text-white rounded-xl px-6 py-3
                                     font-medium hover:bg-purple-700 transition-colors disabled:opacity-50
                                     flex items-center justify-center gap-2"
@@ -326,7 +316,7 @@ export default function FileManager() {
                                     icon="mdi:cloud-upload"
                                     className="text-xl"
                                 />
-                                {uploadMutation.isPending
+                                {isUploading
                                     ? "Загрузка..."
                                     : "Загрузить данные"}
                             </button>

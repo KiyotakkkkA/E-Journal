@@ -47,7 +47,7 @@ const AdminMenu = observer(() => {
         {
             title: "Структура организации",
             description: "Управление структурами организации",
-            icon: "mdi:school",
+            icon: "mdi:home",
             ref: "/admin/structure",
             color: "#CD0074",
             keywords: ["структура", "организация", "институты", "кафедры"],
@@ -60,6 +60,14 @@ const AdminMenu = observer(() => {
             ref: "/admin/data",
             color: "#200772",
             keywords: ["данные", "импорт", "экспорт", "файлы", "excel"],
+        },
+        {
+            title: "Аудитории",
+            description: "Управление аудиториями",
+            icon: "mdi:school",
+            ref: "/admin/auditoriums",
+            color: "#A60400",
+            keywords: ["аудитории", "управление"],
         },
     ];
 

@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\StatisticsController;
 use App\Http\Controllers\Api\FileManagerController;
 use App\Http\Controllers\Api\NotificationsController;
+use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\AuditoriumController;
 
 Route::middleware("web")->group(function () {
     Route::get("/check-auth", [AuthController::class, "checkAuth"]);
@@ -34,6 +36,20 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
 });
 
 Route::prefix('admin')->middleware(['web', 'auth:sanctum'])->group(function () {
+
+    Route::prefix('auditoriums')->group(function () {
+        Route::get('/', [AuditoriumController::class, 'index']);
+        Route::post('/', [AuditoriumController::class, 'store']);
+        Route::put('/{auditorium}', [AuditoriumController::class, 'update']);
+        Route::delete('/{auditorium}', [AuditoriumController::class, 'destroy']);
+    });
+
+    Route::prefix('schedule')->group(function () {
+        Route::get('/', [ScheduleController::class, 'index']);
+        Route::post('/', [ScheduleController::class, 'store']);
+        Route::put('/{schedule}', [ScheduleController::class, 'update']);
+        Route::delete('/{schedule}', [ScheduleController::class, 'destroy']);
+    });
 
     Route::prefix('institutes')->group(function () {
         Route::post('/', [InstitutesController::class, 'store']);
