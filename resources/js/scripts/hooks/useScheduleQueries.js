@@ -1,17 +1,34 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "../../axios";
 
-export const useSchedule = (groupId, dayOfWeek, weekType = "all") => {
+export const useSchedule = (
+    groupId,
+    dayOfWeek,
+    weekType = "all",
+    isTeacher = false
+) => {
     return useQuery({
-        queryKey: ["schedule", groupId, dayOfWeek, weekType],
+        queryKey: ["schedule", groupId, dayOfWeek, weekType, isTeacher],
         queryFn: async () => {
-            if (!groupId || !dayOfWeek) return null;
-            const response = await axios.get(
-                `/api/admin/schedule?group_id=${groupId}&day_of_week=${dayOfWeek}&week_type=${weekType}`
-            );
-            return response.data;
+            let url = "/api/admin/schedule";
+            const params = new URLSearchParams();
+
+            if (isTeacher) {
+                params.append("week_type", "all");
+                url += `?${params.toString()}`;
+                return axios.get(url).then((response) => response.data);
+            } else {
+                if (!groupId) return null;
+                params.append("group_id", groupId);
+                if (dayOfWeek !== "all") {
+                    params.append("day_of_week", dayOfWeek);
+                }
+                params.append("week_type", weekType);
+                url += `?${params.toString()}`;
+                return axios.get(url).then((response) => response.data);
+            }
         },
-        enabled: !!groupId && !!dayOfWeek,
+        enabled: isTeacher || !!groupId,
     });
 };
 

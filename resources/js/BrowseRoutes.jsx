@@ -5,6 +5,7 @@ import PublicRoute from "./components/routes/PublicRoute";
 import AdminRoute from "./components/routes/AdminRoute";
 import AuthorizedRoute from "./components/routes/AuthorizedRoute";
 import Groups from "./pages/common/services/Groups";
+import STSchedules from "./pages/common/services/Schedule";
 import ServicesMenu from "./pages/common/ServicesMenu";
 import Requests from "./pages/admin/services/Requests";
 import OrgStructure from "./pages/admin/services/OrgStructure";
@@ -137,6 +138,14 @@ export default function BrowseRoutes() {
                     element={
                         <AuthorizedRoute>
                             <Groups />
+                        </AuthorizedRoute>
+                    }
+                />
+                <Route
+                    path="/services/schedule"
+                    element={
+                        <AuthorizedRoute>
+                            <STSchedules />
                         </AuthorizedRoute>
                     }
                 />

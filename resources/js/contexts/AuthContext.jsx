@@ -8,6 +8,7 @@ export function AuthProvider({ children, auth }) {
         canViewAdminPanel: auth.canViewAdminPanel,
         isInGroup: auth.isInGroup,
         hasVerifiedEmail: auth.hasVerifiedEmail,
+        group: auth.group,
         roles: {
             isStudent: auth.roles?.isStudent,
             isTeacher: auth.roles?.isTeacher,

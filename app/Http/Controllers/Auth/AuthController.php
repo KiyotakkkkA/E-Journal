@@ -84,8 +84,10 @@ class AuthController extends Controller
             $canViewAdminPanel = $user->hasPermissionTo('view_admin_panel');
             $student = $user->student;
             $isInGroup = false;
+            $group = null;
             if ($student) {
                 $isInGroup = $student->getActiveGroup() !== null;
+                $group = $student->getActiveGroup();
             }
 
             return response()->json([
@@ -93,6 +95,7 @@ class AuthController extends Controller
                 'canViewAdminPanel' => $canViewAdminPanel,
                 'isInGroup' => $isInGroup,
                 'hasVerifiedEmail' => $user->hasEmailVerified(),
+                'group' => $group,
                 'roles' => [
                     'isStudent' => $user->isStudent(),
                     'isTeacher' => $user->isTeacher(),

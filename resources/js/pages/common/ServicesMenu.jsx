@@ -17,18 +17,25 @@ const servicesTextForRoles = {
                 "параметры",
             ],
         },
+        // ... другие сервисы для админа
     },
     isTeacher: {
-        groups: {
-            description: "Просмотр учебных групп по вашим дисциплинам",
-            keywords: ["группы", "просмотр", "дисциплины", "учебные группы"],
+        schedule: {
+            description: "Просмотр вашего расписания занятий",
+            keywords: ["расписание", "занятия", "пары"],
         },
+        // ... другие сервисы для преподавателя
     },
     isStudent: {
         groups: {
             description: "Просмотр вашей учебной группы",
             keywords: ["группа", "просмотр", "моя группа"],
         },
+        schedule: {
+            description: "Просмотр расписания занятий вашей группы",
+            keywords: ["расписание", "занятия", "пары"],
+        },
+        // ... другие сервисы для студента
     },
 };
 
@@ -38,30 +45,58 @@ const ServicesMenu = () => {
 
     const getServiceData = (serviceKey) => {
         for (const role in roles) {
-            if (roles[role]) {
+            if (roles[role] && servicesTextForRoles[role]?.[serviceKey]) {
                 return servicesTextForRoles[role][serviceKey];
             }
         }
+        return null;
     };
 
-    const services = [
+    const availableServices = [
         {
+            key: "groups",
             title: "Группы",
-            description: getServiceData("groups")?.description,
-            keywords: getServiceData("groups")?.keywords,
             icon: "mdi:account-group",
             ref: "/services/groups",
             color: "#4CAF50",
         },
+        {
+            key: "schedule",
+            title: "Расписание",
+            icon: "mdi:calendar-clock",
+            ref: "/services/schedule",
+            color: "#2196F3",
+        },
+        {
+            key: "disciplines",
+            title: "Дисциплины",
+            icon: "mdi:book-open-variant",
+            ref: "/services/disciplines",
+            color: "#9C27B0",
+        },
+        // ... другие сервисы
     ];
 
+    const services = availableServices
+        .map((service) => {
+            const serviceData = getServiceData(service.key);
+            if (!serviceData) return null;
+
+            return {
+                ...service,
+                description: serviceData.description,
+                keywords: serviceData.keywords,
+            };
+        })
+        .filter(Boolean);
+
     const filteredServices = services.filter((service) => {
-        const searchLower = searchQuery.toLowerCase();
+        const searchString = searchQuery.toLowerCase();
         return (
-            service.title.toLowerCase().includes(searchLower) ||
-            service.description.toLowerCase().includes(searchLower) ||
+            service.title.toLowerCase().includes(searchString) ||
+            service.description.toLowerCase().includes(searchString) ||
             service.keywords.some((keyword) =>
-                keyword.toLowerCase().includes(searchLower)
+                keyword.toLowerCase().includes(searchString)
             )
         );
     });

@@ -11,6 +11,7 @@ import {
     useDeleteSchedule,
 } from "@/scripts/hooks/useScheduleQueries";
 import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 import AddLessonModal from "@/components/schedule/AddLessonModal";
 import ScheduleItem from "@/components/schedule/ScheduleItem";
 const DAYS_OF_WEEK = [
@@ -99,6 +100,22 @@ export default function Schedule() {
                         <h1 className="text-2xl font-semibold text-gray-900">
                             Расписание занятий
                         </h1>
+                        <Link
+                            to="/admin"
+                            className="text-gray-500 hover:text-gray-600
+                                    transition-all duration-200 transform
+                                    hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                            <div
+                                className="w-12 h-12 rounded-lg flex items-center justify-center
+                                    bg-gray-100 hover:bg-gray-200 transition-all duration-200"
+                            >
+                                <Icon
+                                    icon="mdi:arrow-left"
+                                    className="text-xl"
+                                />
+                            </div>
+                        </Link>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

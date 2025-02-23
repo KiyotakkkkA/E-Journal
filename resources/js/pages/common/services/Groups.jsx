@@ -114,7 +114,7 @@ const Groups = () => {
     return (
         <MenuLayout>
             <div className="container mx-auto px-4 py-8">
-                {roles.isAdmin || roles.isTeacher ? (
+                {roles.isAdmin ? (
                     <>
                         <div className="flex justify-between items-start mb-8">
                             <div>
@@ -212,9 +212,27 @@ const Groups = () => {
                     <div className="max-w-4xl mx-auto">
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                             <div className="px-6 py-4 bg-purple-50 border-b border-purple-100">
-                                <h2 className="text-lg font-medium text-purple-900">
-                                    Информация о группе
-                                </h2>
+                                <div className="flex items-center justify-between gap-2">
+                                    <h2 className="text-lg font-medium text-purple-900">
+                                        Информация о группе
+                                    </h2>
+                                    <Link
+                                        to="/services"
+                                        className="text-gray-500 hover:text-gray-600
+                                    transition-all duration-200 transform
+                                    hover:-translate-y-0.5 active:translate-y-0 border border-gray-200 rounded-lg"
+                                    >
+                                        <div
+                                            className="w-12 h-12 rounded-lg flex items-center justify-center
+                                    bg-gray-100 hover:bg-gray-200 transition-all duration-200"
+                                        >
+                                            <Icon
+                                                icon="mdi:arrow-left"
+                                                className="text-xl"
+                                            />
+                                        </div>
+                                    </Link>
+                                </div>
                             </div>
                             <div className="p-6">
                                 {group?.students ? (

@@ -14,17 +14,36 @@ class ScheduleController extends Controller
 {
     public function index(Request $request)
     {
+        $user = auth()->user();
         $query = Schedule::with(['group', 'teacher.user', 'lesson.discipline', 'auditorium'])
-            ->where('group_id', $request->group_id)
-            ->where('day_of_week', $request->day_of_week)
             ->where('is_active', true);
 
         if ($request->week_type !== 'all') {
             $query->where('week_type', $request->week_type);
         }
-        // Если выбраны все недели, показываем пары и чётной, и нечётной недели
 
-        return $query->get();
+        if ($user->isTeacher()) {
+            $teacher = Teacher::where('user_id', $user->id)->first();
+            if (!$teacher) {
+                return response()->json([], 200);
+            }
+            $query->where('teacher_id', $teacher->id);
+        } else {
+            if (!$request->group_id) {
+                return response()->json([], 200);
+            }
+            $query->where('group_id', $request->group_id);
+
+            if ($request->day_of_week && $request->day_of_week !== 'all') {
+                $query->where('day_of_week', $request->day_of_week);
+            }
+        }
+
+        $schedules = $query->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->get();
+
+        return response()->json($schedules);
     }
 
     public function store(Request $request)
